@@ -13,7 +13,9 @@ Patch1:		%{name}-libdir.patch
 Patch2:		%{name}-not_implemented_func_hack.patch
 Patch3:		%{name}-elektraenv.patch
 URL:		http://elektra.sf.net
+BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-progs
+Requires:	mktemp
 Obsoletes:	registry
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -122,7 +124,7 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /sbin/ldconfig
 # Create basic key structure for apps
-kdb set -t dir system/sw
+kdb set -t dir system/sw || :
 
 %postun -p /sbin/ldconfig
 
@@ -133,7 +135,7 @@ kdb set -t dir system/sw
 %attr(755,root,root) /%{_lib}/lib*.so
 %attr(755,root,root) /etc/profile.d/*
 %{_includedir}/*
-%{_datadir}/sgml
+%{_datadir}/sgml/*
 %{_mandir}/man[157]/*
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 
