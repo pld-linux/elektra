@@ -3,15 +3,15 @@ Summary(pl):	Rejestr do przechowywania par klucz-warto¶æ u¿ywany zamiast plików 
 Name:		registry
 Version:	0.1.6
 Release:	1
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	04f05693c7be8da6db64f59129b92cf3
-Group:		Base
 License:	LGPL
 Vendor:		Avi Alkalay <avi@unix.sh>
+Group:		Base
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+# Source0-md5:	04f05693c7be8da6db64f59129b92cf3
 URL:		http://registry.sf.net
-Requires:	%{name}-libs = %{version}-%{release}
-BuildRequires:	libxslt-progs
 BuildRequires:	docbook-style-xsl
+BuildRequires:	libxslt-progs
+Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -168,7 +168,7 @@ aplikacji wraz z Rejestrem.
 %install
 rm -rf $RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT{/bin,/lib,%{_includedir},%{_examplesdir}} \
+install -d $RPM_BUILD_ROOT{/bin,/%{_lib},%{_includedir},%{_examplesdir}} \
 	   $RPM_BUILD_ROOT%{_docdir}/{%{name}-devel,%{name}} \
 	   $RPM_BUILD_ROOT%{_mandir}/man{1,3,5,7}
 
@@ -185,8 +185,8 @@ rm -rf $RPM_BUILD_ROOT
 %post
 /bin/rg set -t dir system.sw
 
-%post libs -p /sbin/ldconfig
-%postun libs -p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
@@ -207,4 +207,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) /lib/*
+%attr(755,root,root) /%{_lib}/*
