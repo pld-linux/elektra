@@ -33,8 +33,8 @@ plików konfiguracyjnych.
 
 Ka¿dy program, zamiast przechowywaæ informacje konfiguracyjne w swoim
 w³asnym pliku mo¿e u¿yæ Rejestru, który udostêpnia uniwersaln±,
-szybk±, spójn±, niezawodn±, bezpieczn± dla aplikacji opatrych na
-w±tkach i transakcyjn± infrastrukturê s³u¿±c± do przechowwania
+szybk±, spójn±, niezawodn±, bezpieczn± dla aplikacji opartych na
+w±tkach i transakcyjn± infrastrukturê s³u¿±c± do przechowywania
 parametrów konfiguracyjnych poprzez mechanizm: klucz-warto¶æ.
 
 W ten sposób ka¿da aplikacja mo¿e odczytaæ/zapisaæ swoj± konfiguracjê
