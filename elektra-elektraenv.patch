@@ -1,0 +1,18 @@
+--- w/scripts/elektraenv	1970-08-22 22:34:52.000000000 +0100
++++ elektra/scripts/elektraenv	2004-11-09 22:32:13.716304744 +0100
+@@ -31,12 +31,14 @@
+ ## April 2004
+ ##
+ 
++[ -s /etc/sysconfig/elektra ] && . /etc/sysconfig/elektra
++[ x$RUN = xyes ] || exit 0
+ 
+ if [ -z "$RG" ]; then
+ 	RG=kdb
+ fi
+ 
+-FILE="/tmp/elektraenv$$"
++FILE=$(mktemp /tmp/elektraenv.XXXXXX) || exit 0
+ 
+ #set -vx
+ 
