@@ -2,12 +2,13 @@ Summary:	A registry to store general key-value pairs instead of text configurati
 Summary(pl):	Rejestr do przechowywania par klucz-warto¶æ u¿ywany zamiast plików konfiguracyjnych
 Name:		registry
 Version:	0.1.6
-Release:	1
+Release:	1.1
 License:	LGPL
 Vendor:		Avi Alkalay <avi@unix.sh>
 Group:		Base
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	04f05693c7be8da6db64f59129b92cf3
+Patch0:		%{name}-misc_fixes.patch
 URL:		http://registry.sf.net
 BuildRequires:	docbook-style-xsl
 BuildRequires:	libxslt-progs
@@ -161,9 +162,10 @@ aplikacji wraz z Rejestrem.
 
 %prep
 %setup -q -n registry
+%patch0 -p1
 
 %build
-%{__make} all
+%{__make} all CC="%{__cc}" CFLAGS="%{rpmcflags}" 
 
 %install
 rm -rf $RPM_BUILD_ROOT
