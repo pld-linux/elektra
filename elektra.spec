@@ -10,6 +10,8 @@ Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	f032ec83ffe91f2e7c2a0d70f67749eb
 Patch0:		%{name}-Makefile_CFLAGS.patch
 Patch1:		%{name}-libdir.patch
+Patch2:		%{name}-not_implemented_func_hack.patch
+Patch3:		%{name}-elektraenv.patch
 URL:		http://elektra.sf.net
 BuildRequires:	libxslt-progs
 Obsoletes:	registry
@@ -95,6 +97,8 @@ Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 %setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 %{__make} all \
@@ -104,12 +108,14 @@ Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 %install
 rm -rf $RPM_BUILD_ROOT
 
+install -d $RPM_BUILD_ROOT/etc/sysconfig
 %{__make} install \
 	 LIB=/%{_lib} \
 	 DESTDIR=$RPM_BUILD_ROOT
 
 cp -a $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-devel elektra-api
 
+echo 'RUN="no"' > $RPM_BUILD_ROOT/etc/sysconfig/elektra
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -129,6 +135,7 @@ kdb set -t dir system/sw
 %{_includedir}/*
 %{_datadir}/sgml
 %{_mandir}/man[157]/*
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 
 %files devel
 %defattr(644,root,root,755)
