@@ -169,8 +169,8 @@ aplikacji wraz z Rejestrem.
 rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{/bin,/%{_lib},%{_includedir},%{_examplesdir}} \
-	   $RPM_BUILD_ROOT%{_docdir}/{%{name}-devel,%{name}} \
-	   $RPM_BUILD_ROOT%{_mandir}/man{1,3,5,7}
+	$RPM_BUILD_ROOT%{_docdir}/{%{name}-devel,%{name}} \
+	$RPM_BUILD_ROOT%{_mandir}/man{1,3,5,7}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
