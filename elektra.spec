@@ -1,5 +1,5 @@
 Summary:	A key/value pair database to store software configurations
-#Summary(pl):
+Summary(pl):	Baza kluczy/warto¶ci do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.4.6
 Release:	0.1
@@ -23,11 +23,18 @@ This way any software can read/save his configuration using a
 consistent API. Also, applications can be aware of other applications
 configurations, leveraging easy application integration.
 
-#%%description -l pl
+%description -l pl
+Projekt Eleketra dostarcza szkielet do przechowywania typowych danych
+konfiguracyjnych w postaci klucz-warto¶æ w hierarhicznej bazie danych,
+zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+
+W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
+pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
+konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
 
 %package devel
 Summary:	Include files and API documentation for Elektra Project
-#Summary(pl):
+Summary(pl):	Pliki nag³ówkowe i dokumentacja API projektu Elektra
 Group:		Development/Libraries
 Requires:	elektra = %{epoch}:%{version}-%{release}
 
@@ -43,12 +50,22 @@ configurations, leveraging easy application integration.
 This package contains the include files and API manual pages to use
 the Elektra API in C.
 
-#%%description devel -l pl
+%description devel -l pl
+Projekt Eleketra dostarcza szkielet do przechowywania typowych danych
+konfiguracyjnych w postaci klucz-warto¶æ w hierarhicznej bazie danych,
+zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+
+W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
+pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
+konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
+
+Ten pakiet zawiera pliki nag³ówkowe oraz strony podrêcznika
+systemowego opisuj±cego sposób u¿ycia API Elektry w C.
 
 %package static
-Summary:        Static library for Elektra Project
-#Summary(pl):
-Group:          Libraries
+Summary:	Static library for Elektra Project
+Summary(pl):	Statyczna wersja biblioteki projektu Elektra
+Group:		Development/Libraries
 Requires:	elektra-devel = %{epoch}:%{version}-%{release}
 
 %description static
@@ -62,19 +79,31 @@ configurations, leveraging easy application integration.
 
 This package contains static library for Elektra Project.
 
-#%%description static -l pl
+%description static -l pl
+Projekt Eleketra dostarcza szkielet do przechowywania typowych danych
+konfiguracyjnych w postaci klucz-warto¶æ w hierarhicznej bazie danych,
+zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+
+W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
+pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
+konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
+
+Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 
 %prep
-%setup -q -n elektra
+%setup -q -n %{name}
 %patch0 -p1
 
 %build
-%{__make} all CC="%{__cc}" CFLAGS="%{rpmcflags}"
+%{__make} all \
+	CC="%{__cc}" \
+	CFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install DESTDIR=$RPM_BUILD_ROOT
+%{__make} install \
+	 DESTDIR=$RPM_BUILD_ROOT
 
 cp -a $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-devel elektra-api
 
@@ -105,4 +134,5 @@ kdb set -t dir system/sw
 %{_mandir}/man3/*
 
 %files static
+%defattr(644,root,root,755)
 %{_libdir}/lib*.a
