@@ -1,17 +1,17 @@
 Summary:	A registry to store general key-value pairs instead of text configuration files
 Summary(pl):	Rejestr do przechowywania par klucz-warto¶æ u¿ywany zamiast plików konfiguracyjnych
-Name:		registry
-Version:	0.1.6
-Release:	1.1
-License:	LGPL
+Name:		elektra
+Version:	0.4.6
+Release:	1
+License:	BSD
 Vendor:		Avi Alkalay <avi@unix.sh>
 Group:		Base
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	04f05693c7be8da6db64f59129b92cf3
-Patch0:		%{name}-misc_fixes.patch
-URL:		http://registry.sf.net
+# Source0-md5:	f032ec83ffe91f2e7c2a0d70f67749eb
+URL:		http://elektra.sf.net
 BuildRequires:	docbook-style-xsl
 BuildRequires:	libxslt-progs
+Obsoletes:	registry
 Requires:	%{name}-libs = %{version}-%{release}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -161,8 +161,7 @@ Ten pakiet zawiera pliki biblioteczne konieczne do dzia³ania
 aplikacji wraz z Rejestrem.
 
 %prep
-%setup -q -n registry
-%patch0 -p1
+%setup -q -n %{name}
 
 %build
 %{__make} all CC="%{__cc}" CFLAGS="%{rpmcflags}" 
