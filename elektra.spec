@@ -9,6 +9,7 @@ Group:		Applications/System
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	f032ec83ffe91f2e7c2a0d70f67749eb
 Patch0:		%{name}-Makefile_CFLAGS.patch
+Patch1:		%{name}-libdir.patch
 URL:		http://elektra.sf.net
 BuildRequires:	libxslt-progs
 Obsoletes:	registry
@@ -93,6 +94,7 @@ Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 %prep
 %setup -q -n %{name}
 %patch0 -p1
+%patch1 -p1
 
 %build
 %{__make} all \
@@ -103,6 +105,7 @@ Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
+	 LIB=/%{_lib} \
 	 DESTDIR=$RPM_BUILD_ROOT
 
 cp -a $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-devel elektra-api
@@ -121,7 +124,7 @@ kdb set -t dir system/sw
 %defattr(644,root,root,755)
 %doc articles doc/standards example scripts AUTHORS ChangeLog README TODO
 %attr(755,root,root) /bin/*
-%attr(755,root,root) /lib/lib*.so
+%attr(755,root,root) /%{_lib}/lib*.so
 %attr(755,root,root) /etc/profile.d/*
 %{_includedir}/*
 %{_datadir}/sgml
