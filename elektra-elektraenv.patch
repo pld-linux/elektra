@@ -5,14 +5,14 @@
  ##
  
 +[ -s /etc/sysconfig/elektra ] && . /etc/sysconfig/elektra
-+[ x$RUN = xyes ] || exit 0
++[ x$RUN = xyes ] || return 0
  
  if [ -z "$RG" ]; then
  	RG=kdb
  fi
  
 -FILE="/tmp/elektraenv$$"
-+FILE=$(mktemp /tmp/elektraenv.XXXXXX) || exit 0
++FILE=$(mktemp /tmp/elektraenv.XXXXXX) || return 0
  
  #set -vx
  
