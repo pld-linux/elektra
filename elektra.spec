@@ -175,8 +175,6 @@ install -d $RPM_BUILD_ROOT{/bin,/lib,%{_includedir},%{_examplesdir}} \
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-mv -f $RPM_BUILD_ROOT/bin $RPM_BUILD_ROOT%{_bindir}
-mv -f $RPM_BUILD_ROOT/lib $RPM_BUILD_ROOT%{_libdir}
 mv -f $RPM_BUILD_ROOT%{_docdir}/%{name} $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 mv -f $RPM_BUILD_ROOT%{_docdir}/%{name}-devel $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 mv -f TODO VERSION ChangeLog $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
@@ -185,14 +183,14 @@ mv -f TODO VERSION ChangeLog $RPM_BUILD_ROOT%{_docdir}/%{name}-%{version}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/usr/bin/rg set -t dir system.sw
+/bin/rg set -t dir system.sw
 
 %post libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
 
 %files
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) /bin/*
 %doc %{_docdir}/%{name}-%{version}/*
 %{_mandir}/man1/*
 %{_mandir}/man5/*
@@ -209,4 +207,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/*
+%attr(755,root,root) /lib/*
