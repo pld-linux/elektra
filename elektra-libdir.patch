@@ -1,0 +1,32 @@
+--- elektra/Makefile~	2004-11-09 19:51:22.991243784 +0000
++++ elektra/Makefile	2004-11-09 19:53:18.951615128 +0000
+@@ -8,6 +8,7 @@
+ AFLAGS += -Wall
+ XMLINCLUDES=`xml2-config --cflags`
+ XMLLIBS=`xml2-config --libs`
++LIB=/lib
+ 
+ DTDVERSION=0.1.0
+ SVNREP=http://germane-software.com/repositories/elektra
+@@ -118,16 +119,16 @@
+ 	for x in ${DIRS}; do (cd "$$x"; make DTDVERSION=${DTDVERSION} $@); done
+ 	strip libkdb.so
+ 	strip libregistry.so  # remove me in the future
+-	[ -d "${DESTDIR}/lib" ] || mkdir -p ${DESTDIR}/lib
+-	[ -d "${DESTDIR}/usr/lib" ] || mkdir -p ${DESTDIR}/usr/lib
++	[ -d "${DESTDIR}${LIB}" ] || mkdir -p ${DESTDIR}${LIB}
++	[ -d "${DESTDIR}/usr${LIB}" ] || mkdir -p ${DESTDIR}/usr${LIB}
+ 	[ -d "${DESTDIR}/bin" ] || mkdir -p ${DESTDIR}/bin
+ 	[ -d "${DESTDIR}/usr/include" ] || mkdir -p ${DESTDIR}/usr/include
+ 	[ -d "${DESTDIR}/etc/profile.d" ] || mkdir -p ${DESTDIR}/etc/profile.d
+ 	[ -d "${DESTDIR}/usr/share/doc/${NAME}" ] || mkdir -p ${DESTDIR}/usr/share/doc/${NAME}
+ 	[ -d "${DESTDIR}/usr/share/doc/${NAME}-devel" ] || mkdir -p ${DESTDIR}/usr/share/doc/${NAME}-devel
+-	cp libkdb.so ${DESTDIR}/lib
+-	cp libkdb.a ${DESTDIR}/usr/lib
+-	cp libregistry.so ${DESTDIR}/lib # remove me in the future
++	cp libkdb.so ${DESTDIR}${LIB}
++	cp libkdb.a ${DESTDIR}/usr${LIB}
++	cp libregistry.so ${DESTDIR}${LIB} # remove me in the future
+ 	strip kdb
+ 	cp kdb ${DESTDIR}/bin
+ 	cp kdb.h ${DESTDIR}/usr/include
