@@ -12,7 +12,7 @@ Patch0:		%{name}-Makefile_CFLAGS.patch
 Patch1:		%{name}-libdir.patch
 Patch2:		%{name}-not_implemented_func_hack.patch
 Patch3:		%{name}-elektraenv.patch
-URL:		http://elektra.sf.net/
+URL:		http://elektra.sourceforge.net/
 BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-progs
 Requires(post):	/sbin/ldconfig
