@@ -12,6 +12,7 @@ Patch0:		%{name}-Makefile_CFLAGS.patch
 Patch1:		%{name}-libdir.patch
 Patch2:		%{name}-not_implemented_func_hack.patch
 Patch3:		%{name}-elektraenv.patch
+Patch4:		%{name}-doc.patch
 URL:		http://elektra.sourceforge.net/
 BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-progs
@@ -104,6 +105,7 @@ Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 %{__make} all \
@@ -118,7 +120,9 @@ install -d $RPM_BUILD_ROOT/etc/sysconfig
 	 LIB=/%{_lib} \
 	 DESTDIR=$RPM_BUILD_ROOT
 
-cp -a $RPM_BUILD_ROOT%{_datadir}/doc/%{name}-devel elektra-api
+rm -rf elektra-api
+cp -a $RPM_BUILD_ROOT%{_docdir}/%{name}-devel elektra-api
+rm -rf $RPM_BUILD_ROOT%{_docdir}/%{name}{,-devel}
 
 echo 'RUN="no"' > $RPM_BUILD_ROOT/etc/sysconfig/elektra
 
@@ -144,7 +148,7 @@ kdb set -t dir system/sw || :
 
 %files devel
 %defattr(644,root,root,755)
-%doc bindings elektra-api
+%doc bindings elektra-api/*
 %{_includedir}/*
 %{_mandir}/man3/*
 
