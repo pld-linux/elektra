@@ -1,0 +1,4 @@
+- pl summaries/description
+- fixed group of -static package
+- missing defattr() in %files section of -static package
+- cosmetics
