@@ -1,5 +1,5 @@
 Summary:	A key/value pair database to store software configurations
-Summary(pl.UTF-8):   Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
+Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.4.6
 Release:	0.1
@@ -43,7 +43,7 @@ konfiguracji innych aplikacji, ułatwiając ich integrację.
 
 %package devel
 Summary:	Include files and API documentation for Elektra Project
-Summary(pl.UTF-8):   Pliki nagłówkowe i dokumentacja API projektu Elektra
+Summary(pl.UTF-8):	Pliki nagłówkowe i dokumentacja API projektu Elektra
 Group:		Development/Libraries
 Requires:	elektra = %{epoch}:%{version}-%{release}
 
@@ -73,7 +73,7 @@ systemowego opisującego sposób użycia API Elektry w C.
 
 %package static
 Summary:	Static library for Elektra Project
-Summary(pl.UTF-8):   Statyczna wersja biblioteki projektu Elektra
+Summary(pl.UTF-8):	Statyczna wersja biblioteki projektu Elektra
 Group:		Development/Libraries
 Requires:	elektra-devel = %{epoch}:%{version}-%{release}
 
