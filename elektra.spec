@@ -1,5 +1,5 @@
 Summary:	A key/value pair database to store software configurations
-Summary(pl):	Baza kluczy/warto¶ci do przechowywania konfiguracji oprogramowania
+Summary(pl.UTF-8):   Baza kluczy/wartoÅ›ci do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.4.6
 Release:	0.1
@@ -32,18 +32,18 @@ This way any software can read/save his configuration using a
 consistent API. Also, applications can be aware of other applications
 configurations, leveraging easy application integration.
 
-%description -l pl
+%description -l pl.UTF-8
 Projekt Elektra dostarcza szkielet do przechowywania typowych danych
-konfiguracyjnych w postaci klucz-warto¶æ w hierarchicznej bazie
-danych, zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+konfiguracyjnych w postaci klucz-wartoÅ›Ä‡ w hierarchicznej bazie
+danych, zamiast w pliku tekstowym czytelnym tylko dla czÅ‚owieka.
 
-W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
-pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
-konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
+W ten sposÃ³b oprogramowanie moÅ¼e odczytywaÄ‡/zapisywaÄ‡ konfiguracjÄ™ za
+pomocÄ… spÃ³jnego API. Dodatkowo aplikacje mogÄ… byÄ‡ zorientowane w
+konfiguracji innych aplikacji, uÅ‚atwiajÄ…c ich integracjÄ™.
 
 %package devel
 Summary:	Include files and API documentation for Elektra Project
-Summary(pl):	Pliki nag³ówkowe i dokumentacja API projektu Elektra
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe i dokumentacja API projektu Elektra
 Group:		Development/Libraries
 Requires:	elektra = %{epoch}:%{version}-%{release}
 
@@ -59,21 +59,21 @@ configurations, leveraging easy application integration.
 This package contains the include files and API manual pages to use
 the Elektra API in C.
 
-%description devel -l pl
+%description devel -l pl.UTF-8
 Projekt Elektra dostarcza szkielet do przechowywania typowych danych
-konfiguracyjnych w postaci klucz-warto¶æ w hierarchicznej bazie
-danych, zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+konfiguracyjnych w postaci klucz-wartoÅ›Ä‡ w hierarchicznej bazie
+danych, zamiast w pliku tekstowym czytelnym tylko dla czÅ‚owieka.
 
-W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
-pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
-konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
+W ten sposÃ³b oprogramowanie moÅ¼e odczytywaÄ‡/zapisywaÄ‡ konfiguracjÄ™ za
+pomocÄ… spÃ³jnego API. Dodatkowo aplikacje mogÄ… byÄ‡ zorientowane w
+konfiguracji innych aplikacji, uÅ‚atwiajÄ…c ich integracjÄ™.
 
-Ten pakiet zawiera pliki nag³ówkowe oraz strony podrêcznika
-systemowego opisuj±cego sposób u¿ycia API Elektry w C.
+Ten pakiet zawiera pliki nagÅ‚Ã³wkowe oraz strony podrÄ™cznika
+systemowego opisujÄ…cego sposÃ³b uÅ¼ycia API Elektry w C.
 
 %package static
 Summary:	Static library for Elektra Project
-Summary(pl):	Statyczna wersja biblioteki projektu Elektra
+Summary(pl.UTF-8):   Statyczna wersja biblioteki projektu Elektra
 Group:		Development/Libraries
 Requires:	elektra-devel = %{epoch}:%{version}-%{release}
 
@@ -88,16 +88,16 @@ configurations, leveraging easy application integration.
 
 This package contains static library for Elektra Project.
 
-%description static -l pl
+%description static -l pl.UTF-8
 Projekt Elektra dostarcza szkielet do przechowywania typowych danych
-konfiguracyjnych w postaci klucz-warto¶æ w hierarchicznej bazie
-danych, zamiast w pliku tekstowym czytelnym tylko dla cz³owieka.
+konfiguracyjnych w postaci klucz-wartoÅ›Ä‡ w hierarchicznej bazie
+danych, zamiast w pliku tekstowym czytelnym tylko dla czÅ‚owieka.
 
-W ten sposób oprogramowanie mo¿e odczytywaæ/zapisywaæ konfiguracjê za
-pomoc± spójnego API. Dodatkowo aplikacje mog± byæ zorientowane w
-konfiguracji innych aplikacji, u³atwiaj±c ich integracjê.
+W ten sposÃ³b oprogramowanie moÅ¼e odczytywaÄ‡/zapisywaÄ‡ konfiguracjÄ™ za
+pomocÄ… spÃ³jnego API. Dodatkowo aplikacje mogÄ… byÄ‡ zorientowane w
+konfiguracji innych aplikacji, uÅ‚atwiajÄ…c ich integracjÄ™.
 
-Ten pakiet zawiera wersjê statyczn± biblioteki projektu Elektra.
+Ten pakiet zawiera wersjÄ™ statycznÄ… biblioteki projektu Elektra.
 
 %prep
 %setup -q -n %{name}
