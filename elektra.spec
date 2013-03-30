@@ -9,7 +9,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.7.2
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -259,7 +259,13 @@ kdb set system/sw/kdb/schemapath "%{_datadir}/sgml/elektra-0.7.1/elektra.xsd"
 %{_pkgconfigdir}/elektra.pc
 %{_pkgconfigdir}/elektratools.pc
 %{_mandir}/man3/kdb*.3*
-%{_mandir}/man3/key*.3*
+# too generic name, conflicting with e.g. allegro
+#%{_mandir}/man3/key.3*
+%{_mandir}/man3/keymeta.3*
+%{_mandir}/man3/keyname.3*
+%{_mandir}/man3/keyset.3*
+%{_mandir}/man3/keytest.3*
+%{_mandir}/man3/keyvalue.3*
 
 %files static
 %defattr(644,root,root,755)
