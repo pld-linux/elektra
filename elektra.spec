@@ -164,6 +164,7 @@ cp -f /usr/share/gettext/config.rpath .
 %{__automake}
 %configure \
 	--libdir=/%{_lib} \
+	--disable-ltdl-install \
 	%{?with_db:--enable-berkeleydb} \
 	%{?with_gconf:--enable-gconf} \
 	--enable-passwd \
