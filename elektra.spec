@@ -1,44 +1,33 @@
-# TODO: PLDify init script
+# TODO: use system nickel (in src/plugins/ni)
 #
 # Conditonal build:
-%bcond_with	db	# BerkeleyDB backend [slightly outdated]
-%bcond_with	gconf	# GConf backend [same as above]
-%bcond_with	python	# Python binding [same as above]
+%bcond_with	full	# "full" variant (libelektra-full with all plugins linked in)
 #
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.7.2
-Release:	2
+Version:	0.8.5
+Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	29f14be7693ae627fb8cc30a079b10c9
+# Source0-md5:	6fe4a48d70cefc04c04639e5d85a0ddc
 Patch0:		%{name}-elektraenv.patch
-Patch1:		%{name}-am.patch
 URL:		http://www.libelektra.org/
-%{?with_gconf:BuildRequires:	GConf2-devel}
-BuildRequires:	autoconf >= 2.59
-BuildRequires:	automake
-%{?with_db:BuildRequires:	db-devel}
+BuildRequires:	cmake >= 2.6
+BuildRequires:	dbus-devel
 BuildRequires:	doxygen
 BuildRequires:	gettext-devel
 BuildRequires:	libstdc++-devel
-BuildRequires:	libltdl-devel
-BuildRequires:	libtool
 BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
 %{?with_python:BuildRequires:	python-devel}
+BuildRequires:	yajl-devel
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	mktemp
-# for /usr/share/sgml dir
-Requires:	sgml-common
 Obsoletes:	registry
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define		_bindir		/bin
-%define		_sbindir	/sbin
 
 %description
 The Elektra Project provides a framework to store generic
@@ -62,6 +51,7 @@ konfiguracji innych aplikacji, ułatwiając ich integrację.
 Summary:	Elektra Project libraries
 Summary(pl.UTF-8):	Biblioteki projektu Elektra
 Group:		Libraries
+Obsoletes:	elektra-cpp < 0.8
 Conflicts:	elektra < 0.7
 
 %description libs
@@ -112,25 +102,13 @@ This package contains static libraries for Elektra Project.
 %description static -l pl.UTF-8
 Ten pakiet zawiera statyczne biblioteki projektu Elektra.
 
-%package cpp
-Summary:	C++ interface for Elektra library
-Summary(pl.UTF-8):	Interfejs C++ do biblioteki Elektra
-Group:		Libraries
-Requires:	%{name}-libs = %{version}-%{release}
-
-%description cpp
-C++ interface for Elektra library.
-
-%description cpp -l pl.UTF-8
-Interfejs C++ do biblioteki Elektra.
-
 %package cpp-devel
 Summary:	Header files of C++ interface for Elektra library
 Summary(pl.UTF-8):	Pliki nagłówkowe interfejsu C++ do biblioteki Elektra
 Group:		Development/Libraries
-Requires:	%{name}-cpp = %{version}-%{release}
-Requires:	%{name}-libs = %{version}-%{release}
+Requires:	%{name}-devel = %{version}-%{release}
 Requires:	libstdc++-devel
+Obsoletes:	elektra-cpp-static < 0.8
 
 %description cpp-devel
 Header files of C++ interface for Elektra library.
@@ -138,153 +116,124 @@ Header files of C++ interface for Elektra library.
 %description cpp-devel -l pl.UTF-8
 Pliki nagłówkowe interfejsu C++ do biblioteki Elektra.
 
-%package cpp-static
-Summary:	Static library of C++ interface for Elektra library
-Summary(pl.UTF-8):	Biblioteka statyczna interfejsu C++ do biblioteki Elektra
-Group:		Development/Libraries
-Requires:	%{name}-cpp-devel = %{version}-%{release}
-
-%description cpp-static
-Static library of C++ interface for Elektra library.
-
-%description cpp-static -l pl.UTF-8
-Biblioteka statyczna interfejsu C++ do biblioteki Elektra.
-
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p1
 
 %build
-cp -f /usr/share/gettext/config.rpath .
-%{__libtoolize}
-%{__aclocal} -I m4
-%{__autoconf}
-%{__autoheader}
-%{__automake}
-%configure \
-	--libdir=/%{_lib} \
-	--disable-ltdl-install \
-	%{?with_db:--enable-berkeleydb} \
-	%{?with_gconf:--enable-gconf} \
-	--enable-passwd \
-	%{?with_python:--enable-python}
-# also outdated (as of 0.7.2): daemon, fstab
+install -d build
+cd build
+%cmake .. \
+	%{!?with_full:-DBUILD_FULL=OFF} \
+	-DPLUGINS=ALL \
+	-DTARGET_CMAKE_FOLDER=%{_datadir}/cmake/Modules
+
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT/etc/sysconfig
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	elektrainitdir=/etc/rc.d/init.d
-
-%{!?with_berkeleydb:%{__rm} $RPM_BUILD_ROOT/%{_lib}/elektra/libelektra-ddefault.so}
-
-# prepare docs
-rm -rf installed-doc
-install -d installed-doc
-mv $RPM_BUILD_ROOT%{_docdir}/%{name}-devel installed-doc/elektra-api
-mv $RPM_BUILD_ROOT%{_docdir}/%{name}/scripts installed-doc/scripts
-rmdir $RPM_BUILD_ROOT%{_docdir}/%{name}
+%{__make} -C build install \
+	DESTDIR=$RPM_BUILD_ROOT
 
 echo 'RUN="no"' > $RPM_BUILD_ROOT/etc/sysconfig/elektra
+install -D scripts/elektraenv.sh $RPM_BUILD_ROOT/etc/profile.d/elektraenv.sh
+install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
 
-# move devel files to /usr
-%{__mv} $RPM_BUILD_ROOT/%{_lib}/libelektra.a $RPM_BUILD_ROOT%{_libdir}
-ln -sf /%{_lib}/$(basename $RPM_BUILD_ROOT/%{_lib}/libelektra.so.*.*.*) $RPM_BUILD_ROOT%{_libdir}/libelektra.so
-%{__rm} $RPM_BUILD_ROOT/%{_lib}/libelektra.so
+# just tests
+%{__rm} -r $RPM_BUILD_ROOT%{_libdir}/elektra/tool_exec \
+	$RPM_BUILD_ROOT%{_datadir}/elektra/test_data
 
-# dlopened modules
-%{__rm} $RPM_BUILD_ROOT/%{_lib}/elektra/*.{la,a}
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT/%{_lib}/lib*.la \
-	$RPM_BUILD_ROOT%{_libdir}/lib*.la
+# prepare docs
+%{__rm} -rf installed-doc
+install -d installed-doc
+%{__mv} $RPM_BUILD_ROOT%{_docdir}/%{name}-api installed-doc/elektra-api
+
+# "static" variant (with libelektra-static and thus all plugins linked in);
+# we don't need it
+%{__rm} $RPM_BUILD_ROOT%{_bindir}/kdb-static
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
-# Create basic key structure for apps
-kdb set -t dir system/sw || :
-kdb set system/sw/kdb/schemapath "%{_datadir}/sgml/elektra-0.7.1/elektra.xsd"
-
 %post	libs -p /sbin/ldconfig
 %postun	libs -p /sbin/ldconfig
 
-%post	cpp -p /sbin/ldconfig
-%postun	cpp -p /sbin/ldconfig
-
 %files
 %defattr(644,root,root,755)
-%doc AUTHORS COPYING ChangeLog NEWS README TODO doc/standards installed-doc/scripts
-%attr(755,root,root) /bin/kdb
-%attr(755,root,root) /bin/kdb_static
-%attr(755,root,root) /bin/preload
-%attr(755,root,root) /bin/preload_static
-%dir /%{_lib}/elektra
-%attr(755,root,root) /%{_lib}/elektra/libelektra-default.so
-%attr(755,root,root) /%{_lib}/elektra/libelektra-filesys.so*
-%attr(755,root,root) /%{_lib}/elektra/libelektra-hosts.so*
-%attr(755,root,root) /%{_lib}/elektra/libelektra-passwd.so*
-%if %{with db}
-%attr(755,root,root) /%{_lib}/elektra/libelektra-berkeleydb.so*
-%attr(755,root,root) /%{_lib}/elektra/libelektra-ddefault.so
+%doc doc/{AUTHORS,CHANGES,COPYING,DESIGN,GOALS,NEWS,README,SECURITY,SPECIFICATION,todo}
+# doc/standards installed-doc/scripts
+%attr(755,root,root) %{_bindir}/kdb
+%if %{with full}
+%attr(755,root,root) %{_bindir}/kdb-full
 %endif
-%if %{with gconf}
-%attr(755,root,root) /%{_lib}/elektra/libelektra-gconf.so*
-%endif
-%attr(754,root,root) /etc/rc.d/init.d/kdbd
+%dir %{_libdir}/elektra
+%attr(755,root,root) %{_libdir}/elektra/libelektra-ccode.so
+# R: dbus
+%attr(755,root,root) %{_libdir}/elektra/libelektra-dbus.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-doc.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-dump.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-error.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-fstab.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-glob.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-hexcode.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-hidden.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-hosts.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-iconv.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-network.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-ni.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-null.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-path.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-resolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-simpleini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-struct.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-success.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-syslog.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-tcl.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-template.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-timeofday.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-tracer.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-type.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-uname.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-validation.so
+# R: libxml2
+%attr(755,root,root) %{_libdir}/elektra/libelektra-xmltool.so
+# R: yajl
+%attr(755,root,root) %{_libdir}/elektra/libelektra-yajl.so
 %attr(755,root,root) /etc/profile.d/elektraenv.sh
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/elektra
-%{_datadir}/sgml/elektra-0.7.1
-%{_mandir}/man1/kdb.1*
-%{_mandir}/man5/elektra.5*
-%{_mandir}/man7/elektra.7*
+%{_datadir}/sgml/elektra
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) /%{_lib}/libelektra.so.*.*.*
-%attr(755,root,root) %ghost /%{_lib}/libelektra.so.3
-%attr(755,root,root) %{_libdir}/libelektratools.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libelektratools.so.2
+%attr(755,root,root) %{_libdir}/libelektra.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra.so.4
+%if %{with full}
+%attr(755,root,root) %{_libdir}/libelektra-full.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-full.so.4
+%endif
 
 %files devel
 %defattr(644,root,root,755)
 %doc installed-doc/elektra-api/*
 %attr(755,root,root) %{_libdir}/libelektra.so
-%attr(755,root,root) %{_libdir}/libelektratools.so
-%{_includedir}/kdb*.h
+%if %{with full}
+%attr(755,root,root) %{_libdir}/libelektra-full.so
+%endif
+%dir %{_includedir}/elektra
+%{_includedir}/elektra/*.h
 %{_pkgconfigdir}/elektra.pc
-%{_pkgconfigdir}/elektratools.pc
-%{_mandir}/man3/kdb*.3*
-# too generic name, conflicting with e.g. allegro
-#%{_mandir}/man3/key.3*
-%{_mandir}/man3/keymeta.3*
-%{_mandir}/man3/keyname.3*
-%{_mandir}/man3/keyset.3*
-%{_mandir}/man3/keytest.3*
-%{_mandir}/man3/keyvalue.3*
+%{_datadir}/cmake/Modules/FindElektra.cmake
+%{_mandir}/man3/deprecated.3elektra*
+%{_mandir}/man3/kdb*.3elektra*
+%{_mandir}/man3/key*.3elektra*
+%{_mandir}/man3/plugin.3elektra*
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libelektra.a
-%{_libdir}/libelektratools.a
-
-%files cpp
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libelektra-cpp.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libelektra-cpp.so.0
+%{_libdir}/libelektra-static.a
 
 %files cpp-devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libelektra-cpp.so
-%{_includedir}/kdb
-%{_includedir}/key
-%{_includedir}/keyset
-%{_pkgconfigdir}/elektracpp.pc
-
-%files cpp-static
-%defattr(644,root,root,755)
-%{_libdir}/libelektra-cpp.a
+%{_includedir}/elektra/*.hpp
