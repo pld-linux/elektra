@@ -142,7 +142,7 @@ install -D scripts/elektraenv.sh $RPM_BUILD_ROOT/etc/profile.d/elektraenv.sh
 install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
 
 # just tests
-%{__rm} -r $RPM_BUILD_ROOT%{_libdir}/elektra/tool_exec \
+%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/lib/elektra/tool_exec \
 	$RPM_BUILD_ROOT%{_datadir}/elektra/test_data
 
 # prepare docs
