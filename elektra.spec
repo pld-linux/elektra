@@ -128,7 +128,7 @@ cd build
 	-DPLUGINS=ALL \
 	-DTARGET_CMAKE_FOLDER=%{_datadir}/cmake/Modules
 
-%{__make}
+%{__make} -j1
 
 %install
 rm -rf $RPM_BUILD_ROOT
