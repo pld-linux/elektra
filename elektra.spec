@@ -6,12 +6,12 @@
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.8.5
+Version:	0.8.6
 Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	6fe4a48d70cefc04c04639e5d85a0ddc
+# Source0-md5:	4a59824e70a29295e9ef9ae7605d9299
 Patch0:		%{name}-elektraenv.patch
 URL:		http://www.libelektra.org/
 BuildRequires:	cmake >= 2.6
@@ -209,6 +209,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libelektra.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra.so.4
+%attr(755,root,root) %{_libdir}/libelektratools.so
 %if %{with full}
 %attr(755,root,root) %{_libdir}/libelektra-full.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-full.so.4
@@ -233,7 +234,19 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libelektra-static.a
+%{_libdir}/libelektratools-static.a
 
 %files cpp-devel
 %defattr(644,root,root,755)
 %{_includedir}/elektra/*.hpp
+# libelektratools API man pages
+%{_mandir}/man3/backend.hpp.3elektra*
+%{_mandir}/man3/backends.hpp.3elektra*
+%{_mandir}/man3/modules.cpp.3elektra*
+%{_mandir}/man3/modules.hpp.3elektra*
+%{_mandir}/man3/plugin.cpp.3elektra*
+%{_mandir}/man3/plugin.hpp.3elektra*
+%{_mandir}/man3/plugins.cpp.3elektra*
+%{_mandir}/man3/plugins.hpp.3elektra*
+%{_mandir}/man3/src_backend.cpp.3elektra*
+%{_mandir}/man3/toolexcept.hpp.3elektra*
