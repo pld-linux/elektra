@@ -17,7 +17,7 @@ URL:		http://www.libelektra.org/
 BuildRequires:	cmake >= 2.6
 BuildRequires:	dbus-devel
 BuildRequires:	doxygen
-BuildRequires:	gettext-devel
+BuildRequires:	gettext-tools
 BuildRequires:	libstdc++-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	libxslt-progs
