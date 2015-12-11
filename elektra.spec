@@ -409,29 +409,26 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-xmltool.so
 # R: yajl
 %attr(755,root,root) %{_libdir}/elektra/libelektra-yajl.so
-%if "%{_libdir}" != "%{_prefix}/lib"
-%dir %{_prefix}/lib/elektra
-%endif
-%dir %{_prefix}/lib/elektra/tool_exec
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/benchmark-createtree
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/convert-fstab
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/convert-hosts
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/convert-inittab
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/convert-users
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/elektra-merge
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/elektra-mount
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/elektra-umount
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/elektrify-getenv
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/example-xorg
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/getenv
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/list-tools
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/mount-augeas
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/mount-info
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/mount-kde
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/mount-openicc
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/mount-spec
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/race
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/umount-all
+%dir %{_libdir}/elektra/tool_exec
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/benchmark-createtree
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-fstab
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-hosts
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-inittab
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-users
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-merge
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-mount
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-umount
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/elektrify-getenv
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/example-xorg
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/getenv
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/list-tools
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-augeas
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-info
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-kde
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-openicc
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-spec
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/race
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/umount-all
 
 %attr(755,root,root) /etc/profile.d/kdb.sh
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/elektra
@@ -440,7 +437,7 @@ rm -rf $RPM_BUILD_ROOT
 %if 0
 %files gen ?
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/gen
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/gen
 %{py_sitescriptdir}/elektra_gen-%{version}-py*.egg-info
 # FIXME: should be in elektra_gen subdir
 %{py_sitescriptdir}/support
@@ -449,7 +446,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files gui
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_prefix}/lib/elektra/tool_exec/qt-gui
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/qt-gui
 
 %files -n bash-completion-elektra
 %defattr(644,root,root,755)
