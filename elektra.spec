@@ -49,6 +49,7 @@ BuildRequires:	libxslt-progs
 BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-devel >= 1:2.7}
 %{?with_python3:BuildRequires:	python3-devel >= 1:3.2}
+BuildRequires:	ronn
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.612
 BuildRequires:	swig >= 2
@@ -429,10 +430,40 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-spec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/race
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/umount-all
-
 %attr(755,root,root) /etc/profile.d/kdb.sh
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/elektra
 %{_datadir}/sgml/elektra
+%{_mandir}/man1/kdb.1*
+%{_mandir}/man1/kdb-check.1*
+%{_mandir}/man1/kdb-convert.1*
+%{_mandir}/man1/kdb-cp.1*
+%{_mandir}/man1/kdb-elektrify-getenv.1*
+%{_mandir}/man1/kdb-export.1*
+%{_mandir}/man1/kdb-file.1*
+%{_mandir}/man1/kdb-fstab.1*
+%{_mandir}/man1/kdb-get.1*
+%{_mandir}/man1/kdb-getmeta.1*
+%{_mandir}/man1/kdb-help.1*
+%{_mandir}/man1/kdb-import.1*
+%{_mandir}/man1/kdb-info.1*
+%{_mandir}/man1/kdb-introduction.1*
+%{_mandir}/man1/kdb-list.1*
+%{_mandir}/man1/kdb-list-tools.1*
+%{_mandir}/man1/kdb-ls.1*
+%{_mandir}/man1/kdb-lsmeta.1*
+%{_mandir}/man1/kdb-merge.1*
+%{_mandir}/man1/kdb-mount.1*
+%{_mandir}/man1/kdb-mv.1*
+%{_mandir}/man1/kdb-remount.1*
+%{_mandir}/man1/kdb-rm.1*
+%{_mandir}/man1/kdb-set.1*
+%{_mandir}/man1/kdb-setmeta.1*
+%{_mandir}/man1/kdb-sget.1*
+%{_mandir}/man1/kdb-shell.1*
+%{_mandir}/man1/kdb-test.1*
+%{_mandir}/man1/kdb-umount.1*
+%{_mandir}/man1/kdb-vset.1*
+%{_mandir}/man7/elektra-*.7*
 
 %if 0
 %files gen ?
@@ -447,6 +478,7 @@ rm -rf $RPM_BUILD_ROOT
 %files gui
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/qt-gui
+%{_mandir}/man1/kdb-qt-gui.1*
 
 %files -n bash-completion-elektra
 %defattr(644,root,root,755)
