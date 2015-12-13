@@ -2,7 +2,7 @@
 #
 # Conditonal build:
 %bcond_with	full	# "full" variant (libelektra-full with all plugins linked in)
-%bcond_with	java	# Java support: JNA binding and JNI plugin (needs Java 8)
+%bcond_without	java	# Java support: JNA binding and JNI plugin (needs Java 8)
 %bcond_without	glib	# GLib/GObject binding
 %bcond_without	lua	# Lua (5.2) support: binding and plugin
 %bcond_without	python2	# Python 2 support: binding and plugin
@@ -38,8 +38,11 @@ BuildRequires:	doxygen
 BuildRequires:	gettext-tools
 %{?with_glib:BuildRequires:	glib2-devel >= 1:2.36}
 %{?with_glib:BuildRequires:	gobject-introspection-devel >= 1.38}
+# for binding
 %{?with_java:BuildRequires:	java-jna}
 %{?with_java:BuildRequires:	jdk >= 1.8}
+# jawt for plugin
+%{?with_java:BuildRequires:	jre-X11 >= 1.8}
 BuildRequires:	libgcrypt-devel
 %{?with_qt:BuildRequires:	libmarkdown-devel}
 BuildRequires:	libstdc++-devel
@@ -93,6 +96,64 @@ Qt based GUI for Elektra.
 
 %description gui -l pl.UTF-8
 Oparty na Qt graficzny interfejs do Elektry.
+
+%package plugin-jni
+Summary:	Java JNI plugin for Elektra
+Summary(pl.UTF-8):	Wtyczka Java JNI dla Elektry
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+# jawt
+Requires:	jre-X11 >= 1.8
+
+%description plugin-jni
+Java JNI plugin for Elektra. It allows to use plugins written in Java.
+
+%description plugin-jni -l pl.UTF-8
+Wtyczka Java JNI dla Elektry. Pozwala na używanie wtyczek napisanych w
+Javie.
+
+%package plugin-lua
+Summary:	Lua plugin for Elektra
+Summary(pl.UTF-8):	Wtyczka Lua dla Elektry
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	lua52-libs >= 5.2
+
+%description plugin-lua
+Lua plugin for Elektra. It allows to use plugins written in Lua.
+
+%description plugin-lua -l pl.UTF-8
+Wtyczka Lua dla Elektry. Pozwala na używanie wtyczek napisanych w Lua.
+
+%package plugin-python2
+Summary:	Python 2 plugin for Elektra
+Summary(pl.UTF-8):	Wtyczka Python 2 dla Elektry
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	python-libs >= 1:2.7
+
+%description plugin-python2
+Python 2 plugin for Elektra. It allows to use plugins written in
+Python 2.
+
+%description plugin-python2 -l pl.UTF-8
+Wtyczka 2 Python dla Elektry. Pozwala na używanie wtyczek napisanych w
+Pythonie 2.
+
+%package plugin-python3
+Summary:	Python plugin for Elektra
+Summary(pl.UTF-8):	Wtyczka Python dla Elektry
+Group:		Libraries
+Requires:	%{name} = %{version}-%{release}
+Requires:	python3-libs >= 1:3.2
+
+%description plugin-python3
+Python 3 plugin for Elektra. It allows to use plugins written in
+Python 3.
+
+%description plugin-python3 -l pl.UTF-8
+Wtyczka Python 3 dla Elektry. Pozwala na używanie wtyczek napisanych w
+Pythonie 3.
 
 %package -n bash-completion-elektra
 Summary:	Bash completion for Elektra commands
@@ -201,6 +262,20 @@ GLib/GObject binding for Elektra - development files.
 
 %description glib-devel -l pl.UTF-8
 Wiązanie GLib/GObject do Elektry - pliki programistyczne.
+
+%package -n java-elektra
+Summary:	Java binding for Elektra
+Summary(pl.UTF-8):	Wiązanie języka Java dla Elektry
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+Requires:	java-jna
+Requires:	jre
+
+%description -n java-elektra
+Java binding for Elektra.
+
+%description -n java-elektra -l pl.UTF-8
+Wiązanie języka Java dla Elektry.
 
 %package -n lua-elektra
 Summary:	Lua binding for Elektra
@@ -371,10 +446,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-lineendings.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-list.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-logchange.so
-%if %{with lua}
-# R: lua52-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-lua.so
-%endif
 %attr(755,root,root) %{_libdir}/elektra/libelektra-mathcheck.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-network.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-noresolver.so
@@ -382,14 +453,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-ni.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-null.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-path.so
-%if %{with python2}
-# R: python-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-python2.so
-%endif
-%if %{with python3}
-# R: python3-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-python.so
-%endif
 %attr(755,root,root) %{_libdir}/elektra/libelektra-regexstore.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-rename.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-resolver.so
@@ -479,6 +542,34 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/qt-gui
 %{_mandir}/man1/kdb-qt-gui.1*
+
+%if %{with java}
+%files plugin-jni
+%defattr(644,root,root,755)
+# R: jre with jawt
+%attr(755,root,root) %{_libdir}/elektra/libelektra-jni.so
+%endif
+
+%if %{with lua}
+%files plugin-lua
+%defattr(644,root,root,755)
+# R: lua52-libs
+%attr(755,root,root) %{_libdir}/elektra/libelektra-lua.so
+%endif
+
+%if %{with python2}
+%files plugin-python2
+%defattr(644,root,root,755)
+# R: python-libs
+%attr(755,root,root) %{_libdir}/elektra/libelektra-python2.so
+%endif
+
+%if %{with python3}
+%files plugin-python3
+%defattr(644,root,root,755)
+# R: python3-libs
+%attr(755,root,root) %{_libdir}/elektra/libelektra-python.so
+%endif
 
 %files -n bash-completion-elektra
 %defattr(644,root,root,755)
@@ -578,6 +669,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/gir-1.0/GElektra-4.0.gir
 %{_includedir}/elektra/gelektra-*.h
 %{_pkgconfigdir}/gelektra-4.0.pc
+%endif
+
+%if %{with java}
+%files -n java-elektra
+%defattr(644,root,root,755)
+%{_javadir}/elektra-1.jar
+%{_javadir}/elektra.jar
 %endif
 
 %if %{with lua}
