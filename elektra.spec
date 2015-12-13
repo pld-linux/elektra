@@ -674,8 +674,8 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with java}
 %files -n java-elektra
 %defattr(644,root,root,755)
-%{_javadir}/elektra-1.jar
-%{_javadir}/elektra.jar
+%{_javadir}/libelektra-1.jar
+%{_javadir}/libelektra.jar
 %endif
 
 %if %{with lua}
