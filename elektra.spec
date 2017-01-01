@@ -12,13 +12,12 @@
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.8.14
-Release:	2
+Version:	0.8.19
+Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	a87cd3845e590bf413959dfd555e3704
-Patch0:		%{name}-elektraenv.patch
+# Source0-md5:	6669e765c834e259fb7570f126b85d7e
 Patch1:		%{name}-no-markdown.patch
 Patch2:		%{name}-no-deb.patch
 URL:		http://www.libelektra.org/
@@ -345,7 +344,6 @@ Wiązanie Pythona 3 GI dla Elektry.
 
 %prep
 %setup -q
-%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 
@@ -364,13 +362,10 @@ cd build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT/etc/sysconfig
 
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-%{__mv} $RPM_BUILD_ROOT/etc/profile.d/{kdb,kdb.sh}
-echo 'RUN="no"' > $RPM_BUILD_ROOT/etc/sysconfig/elektra
 install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
 
 %if %{with python2}
@@ -384,18 +379,12 @@ install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
 %endif
 
-# "static" variant (with libelektra-static and thus all plugins linked in);
-# we don't need it
-%{__rm} $RPM_BUILD_ROOT%{_bindir}/kdb-static
-
-%{__rm} -r $RPM_BUILD_ROOT%{_datadir}/elektra/test_data
-
 # prepare docs
 %{__rm} -rf installed-doc
 install -d installed-doc
 %{__mv} $RPM_BUILD_ROOT%{_docdir}/%{name}-api installed-doc/elektra-api
 
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*,src_plugins_*_md}.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*}.3elektra
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -493,8 +482,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-spec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/race
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/umount-all
-%attr(755,root,root) /etc/profile.d/kdb.sh
-%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/elektra
 %{_datadir}/sgml/elektra
 %{_mandir}/man1/kdb.1*
 %{_mandir}/man1/kdb-check.1*
