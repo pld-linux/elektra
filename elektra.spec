@@ -356,7 +356,8 @@ cd build
 	-DINSTALL_TESTING=FALSE \
 	-DPLUGINS=ALL \
 	-DTARGET_CMAKE_FOLDER=%{_datadir}/cmake/Modules \
-	-DTOOLS="kdb;race%{?with_gen:;gen}%{?with_qt:;qt-gui}"
+	-DTOOLS="kdb;race%{?with_gen:;gen}%{?with_qt:;qt-gui}" \
+	-DBUILD_STATIC=ON
 
 %{__make} -j1
 
@@ -367,6 +368,9 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
+
+install -d $RPM_BUILD_ROOT/etc/bash_completion.d
+mv $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
 
 %if %{with python2}
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
@@ -397,7 +401,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc doc/{AUTHORS,COPYING,DESIGN.md,GOALS.md,NEWS.md,SECURITY.md,todo}
+%doc doc/{AUTHORS,DESIGN.md,GOALS.md,NEWS.md,SECURITY.md,todo}
 # doc/standards installed-doc/scripts
 %attr(755,root,root) %{_bindir}/kdb
 %if %{with full}
@@ -406,21 +410,32 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/elektra
 # R: augeas-libs
 %attr(755,root,root) %{_libdir}/elektra/libelektra-augeas.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-base64.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-blockresolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-boolean.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-c.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-cachefilter.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-ccode.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-conditionals.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-constants.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-counter.so
 # R: libgcrypt
-%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_gcrypt.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_openssl.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-csvstorage.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-curlget.so
 # R: dbus
 %attr(755,root,root) %{_libdir}/elektra/libelektra-dbus.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-desktop.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-doc.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-dpkg.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-dump.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-enum.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-error.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-fcrypt.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-filecheck.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-fstab.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-gitresolver.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-glob.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hexcode.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hidden.so
@@ -428,6 +443,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-iconv.so
 # uses internal inih library
 %attr(755,root,root) %{_libdir}/elektra/libelektra-ini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-iterate.so
 # R: systemd-libs
 %attr(755,root,root) %{_libdir}/elektra/libelektra-journald.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-keytometa.so
@@ -436,17 +452,26 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-list.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-logchange.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-mathcheck.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-mozprefs.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-network.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-noresolver.so
 # uses internal nickel library
 %attr(755,root,root) %{_libdir}/elektra/libelektra-ni.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-null.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-passwd.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-path.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-profile.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-regexstore.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-rename.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-resolver.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-resolver_fm_*.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-required.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-semlock.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-shell.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-simplespeclang.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-simpleini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-spec.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-storage.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-struct.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-sync.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-syslog.so
@@ -464,6 +489,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-yajl.so
 %dir %{_libdir}/elektra/tool_exec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/benchmark-createtree
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/configure-firefox
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-fstab
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-hosts
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/convert-inittab
@@ -471,23 +497,29 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-merge
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-mount
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/elektra-umount
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/elektrify-open
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/elektrify-getenv
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/example-xorg
-%attr(755,root,root) %{_libdir}/elektra/tool_exec/getenv
+%dir %{_libdir}/elektra/tool_exec/ffconfig
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/setupConfig
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/setupHomepage
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/setupProxy
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/writeConfigFiles
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/find-tools
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/install-sh-completion
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/list-tools
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-augeas
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-info
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-kde
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-openicc
-%attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-spec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/race
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/umount-all
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/upgrade-bootstrap
 %{_datadir}/sgml/elektra
 %{_mandir}/man1/kdb.1*
 %{_mandir}/man1/kdb-check.1*
 %{_mandir}/man1/kdb-convert.1*
 %{_mandir}/man1/kdb-cp.1*
-%{_mandir}/man1/kdb-elektrify-getenv.1*
 %{_mandir}/man1/kdb-export.1*
 %{_mandir}/man1/kdb-file.1*
 %{_mandir}/man1/kdb-fstab.1*
@@ -527,7 +559,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files gui
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/elektra-qt-editor
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/qt-gui
+%{_datadir}/appdata/org.libelektra.elektra-qt-editor.appdata.xml
+%{_desktopdir}/org.libelektra.elektra-qt-editor.desktop
+%{_iconsdir}/hicolor/scalable/apps/elektra-symbolic.svg
+%{_iconsdir}/hicolor/scalable/apps/elektra.svg
 %{_mandir}/man1/kdb-qt-gui.1*
 
 %if %{with java}
@@ -566,8 +603,20 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libelektra.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra.so.4
-%attr(755,root,root) %{_libdir}/libelektragetenv.so
-%attr(755,root,root) %{_libdir}/libelektratools.so
+%attr(755,root,root) %{_libdir}/libelektra-core.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-core.so.4
+%attr(755,root,root) %{_libdir}/libelektra-ease.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-ease.so.4
+%attr(755,root,root) %{_libdir}/libelektra-kdb.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-kdb.so.4
+%attr(755,root,root) %{_libdir}/libelektra-meta.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-meta.so.4
+%attr(755,root,root) %{_libdir}/libelektra-plugin.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-plugin.so.4
+%attr(755,root,root) %{_libdir}/libelektra-proposal.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-proposal.so.4
+%attr(755,root,root) %{_libdir}/libelektratools.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektratools.so.2
 %if %{with full}
 %attr(755,root,root) %{_libdir}/libelektra-full.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-full.so.4
@@ -581,7 +630,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libelektra-full.so
 %endif
 %dir %{_includedir}/elektra
-%{_includedir}/elektra/crypto_internal.h
 %{_includedir}/elektra/kdb*.h
 %{_pkgconfigdir}/elektra.pc
 %{_datadir}/cmake/Modules/ElektraConfig*.cmake
@@ -593,7 +641,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/meta.3elektra*
 %{_mandir}/man3/plugin.3elektra*
 %{_mandir}/man3/proposal.3elektra*
-%{_mandir}/man3/proposal.c.3elektra*
 
 %files static
 %defattr(644,root,root,755)
