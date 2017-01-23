@@ -8,12 +8,12 @@
 %bcond_without	python2	# Python 2 support: binding and plugin
 %bcond_without	python3	# Python 3 support: binding and plugin
 %bcond_without	qt	# Qt GUI
-#
+
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.19
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -26,8 +26,8 @@ BuildRequires:	Qt5Core-devel >= 5
 BuildRequires:	Qt5Gui-devel >= 5
 BuildRequires:	Qt5Qml-devel >= 5
 BuildRequires:	Qt5Quick-devel >= 5
-BuildRequires:	Qt5Widgets-devel >= 5
 BuildRequires:	Qt5Test-devel >= 5
+BuildRequires:	Qt5Widgets-devel >= 5
 %endif
 BuildRequires:	augeas-devel >= 1.0
 BuildRequires:	boost-devel
@@ -160,6 +160,9 @@ Summary(pl.UTF-8):	Bashowe uzupełnianie parametrów dla poleceń z pakietu Elek
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	bash-completion
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description -n bash-completion-elektra
 Bash completion for Elektra kdb command.
