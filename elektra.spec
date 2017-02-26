@@ -13,7 +13,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.19
-Release:	2
+Release:	3
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -386,12 +386,16 @@ mv $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
 %endif
 
+# "static" variant (with libelektra-static and thus all plugins linked in);
+# we don't need it
+%{__rm} $RPM_BUILD_ROOT%{_bindir}/kdb-static
+
 # prepare docs
 %{__rm} -rf installed-doc
 install -d installed-doc
 %{__mv} $RPM_BUILD_ROOT%{_docdir}/%{name}-api installed-doc/elektra-api
 
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*}.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*,md_scripts_README,src_libs_getenv_README_md}.3elektra
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -523,11 +527,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/kdb-check.1*
 %{_mandir}/man1/kdb-convert.1*
 %{_mandir}/man1/kdb-cp.1*
+%{_mandir}/man1/kdb-editor.1*
 %{_mandir}/man1/kdb-export.1*
 %{_mandir}/man1/kdb-file.1*
+%{_mandir}/man1/kdb-find-tools.1*
 %{_mandir}/man1/kdb-fstab.1*
 %{_mandir}/man1/kdb-get.1*
 %{_mandir}/man1/kdb-getmeta.1*
+%{_mandir}/man1/kdb-global-mount.1*
 %{_mandir}/man1/kdb-help.1*
 %{_mandir}/man1/kdb-import.1*
 %{_mandir}/man1/kdb-info.1*
@@ -545,6 +552,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/kdb-setmeta.1*
 %{_mandir}/man1/kdb-sget.1*
 %{_mandir}/man1/kdb-shell.1*
+%{_mandir}/man1/kdb-spec-mount.1*
 %{_mandir}/man1/kdb-test.1*
 %{_mandir}/man1/kdb-umount.1*
 %{_mandir}/man1/kdb-vset.1*
@@ -629,6 +637,13 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc doc/API.md installed-doc/elektra-api/html
 %attr(755,root,root) %{_libdir}/libelektra.so
+%attr(755,root,root) %{_libdir}/libelektra-core.so
+%attr(755,root,root) %{_libdir}/libelektra-ease.so
+%attr(755,root,root) %{_libdir}/libelektra-kdb.so
+%attr(755,root,root) %{_libdir}/libelektra-meta.so
+%attr(755,root,root) %{_libdir}/libelektra-plugin.so
+%attr(755,root,root) %{_libdir}/libelektra-proposal.so
+%attr(755,root,root) %{_libdir}/libelektratools.so
 %if %{with full}
 %attr(755,root,root) %{_libdir}/libelektra-full.so
 %endif
