@@ -373,7 +373,7 @@ rm -rf $RPM_BUILD_ROOT
 install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
 
 install -d $RPM_BUILD_ROOT/etc/bash_completion.d
-mv $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
+%{__mv} $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
 
 %if %{with python2}
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
@@ -395,7 +395,13 @@ mv $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
 install -d installed-doc
 %{__mv} $RPM_BUILD_ROOT%{_docdir}/%{name}-api installed-doc/elektra-api
 
+# these don't belong to man3
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*,md_scripts_README,src_libs_getenv_README_md}.3elektra
+# internal, not part of API
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/doc.h.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{array,backend,dl,doc,ease_keyname,elektra_{keyname,plugin,proposal},exportsymbols,functional,internal,kdbenum,log,markdownlinkconverter,meta,mount,nolog,owner,plugin_plugin,proposal_proposal,split,static,trie}.c.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{benchmark_plugins,examples_backend}.cpp.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{internaldatastructs,std_hash_*_,trie,vheap,vstack}.3elektra
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -654,8 +660,22 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/cmake/Modules/ElektraTargetsLibelektra*.cmake
 %{_mandir}/man3/api.3elektra*
 %{_mandir}/man3/deprecated.3elektra*
-%{_mandir}/man3/kdb*.3elektra*
-%{_mandir}/man3/key*.3elektra*
+%{_mandir}/man3/kdb.3elektra*
+%{_mandir}/man3/kdb.c.3elektra*
+%{_mandir}/man3/kdb_*.3elektra*
+%{_mandir}/man3/kdb*.h.3elektra*
+%{_mandir}/man3/key.3elektra*
+%{_mandir}/man3/keymeta.3elektra*
+%{_mandir}/man3/keyname.3elektra*
+%{_mandir}/man3/keyset.3elektra*
+%{_mandir}/man3/keytest.3elektra*
+%{_mandir}/man3/keyvalue.3elektra*
+%{_mandir}/man3/key.c.3elektra*
+%{_mandir}/man3/keyhelpers.c.3elektra*
+%{_mandir}/man3/keymeta.c.3elektra*
+%{_mandir}/man3/keyset.c.3elektra*
+%{_mandir}/man3/keytest.c.3elektra*
+%{_mandir}/man3/keyvalue.c.3elektra*
 %{_mandir}/man3/meta.3elektra*
 %{_mandir}/man3/plugin.3elektra*
 %{_mandir}/man3/proposal.3elektra*
@@ -671,16 +691,26 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/helper
 %{_includedir}/elektra/merging
 # libelektratools API man pages
+%{_mandir}/man3/automergeconfiguration.cpp.3elektra*
 %{_mandir}/man3/automergeconfiguration.hpp.3elektra*
 %{_mandir}/man3/automergestrategy.cpp.3elektra*
 %{_mandir}/man3/automergestrategy.hpp.3elektra*
+%{_mandir}/man3/backend.hpp.3elektra*
+%{_mandir}/man3/backendbuilder.cpp.3elektra*
+%{_mandir}/man3/backendbuilder.hpp.3elektra*
+%{_mandir}/man3/backendparser.cpp.3elektra*
+%{_mandir}/man3/backendparser.hpp.3elektra*
+%{_mandir}/man3/backends.cpp.3elektra*
+%{_mandir}/man3/backends.hpp.3elektra*
 %{_mandir}/man3/comparison.cpp.3elektra*
 %{_mandir}/man3/comparison.hpp.3elektra*
-%{_mandir}/man3/backend.hpp.3elektra*
-%{_mandir}/man3/backends.hpp.3elektra*
+%{_mandir}/man3/importmergeconfiguration.cpp.3elektra*
 %{_mandir}/man3/importmergeconfiguration.hpp.3elektra*
 %{_mandir}/man3/interactivemergestrategy.cpp.3elektra*
 %{_mandir}/man3/interactivemergestrategy.hpp.3elektra*
+%{_mandir}/man3/kdb*.hpp.3elektra*
+%{_mandir}/man3/key*.hpp.3elektra*
+%{_mandir}/man3/keyhelper.cpp.3elektra*
 %{_mandir}/man3/mergeconfiguration.hpp.3elektra*
 %{_mandir}/man3/mergeconflict.hpp.3elektra*
 %{_mandir}/man3/mergeconflictstrategy.cpp.3elektra*
@@ -689,21 +719,32 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/mergeresult.hpp.3elektra*
 %{_mandir}/man3/mergetask.hpp.3elektra*
 %{_mandir}/man3/mergetestutils.cpp.3elektra*
+%{_mandir}/man3/merging.cpp.3elektra*
+%{_mandir}/man3/mergingkdb.cpp.3elektra*
+%{_mandir}/man3/mergingkdb.hpp.3elektra*
 %{_mandir}/man3/metamergestrategy.cpp.3elektra*
 %{_mandir}/man3/metamergestrategy.hpp.3elektra*
 %{_mandir}/man3/newkeystrategy.cpp.3elektra*
 %{_mandir}/man3/newkeystrategy.hpp.3elektra*
+%{_mandir}/man3/onesidemergeconfiguration.cpp.3elektra*
 %{_mandir}/man3/onesidemergeconfiguration.hpp.3elektra*
 %{_mandir}/man3/onesidestrategy.cpp.3elektra*
 %{_mandir}/man3/onesidestrategy.hpp.3elektra*
 %{_mandir}/man3/onesidevaluestrategy.cpp.3elektra*
+%{_mandir}/man3/onesidevaluestrategy.hpp.3elektra*
+%{_mandir}/man3/overwritemergeconfiguration.cpp.3elektra*
 %{_mandir}/man3/overwritemergeconfiguration.hpp.3elektra*
 %{_mandir}/man3/modules.cpp.3elektra*
 %{_mandir}/man3/modules.hpp.3elektra*
 %{_mandir}/man3/plugin.cpp.3elektra*
 %{_mandir}/man3/plugin.hpp.3elektra*
+%{_mandir}/man3/plugindatabase.cpp.3elektra*
+%{_mandir}/man3/plugindatabase.hpp.3elektra*
 %{_mandir}/man3/plugins.cpp.3elektra*
 %{_mandir}/man3/plugins.hpp.3elektra*
+%{_mandir}/man3/pluginspec.cpp.3elektra*
+%{_mandir}/man3/pluginspec.hpp.3elektra*
+%{_mandir}/man3/specreader.hpp.3elektra*
 %{_mandir}/man3/src_backend.cpp.3elektra*
 %{_mandir}/man3/testtool_*.cpp.3elektra*
 %{_mandir}/man3/threewaymerge.cpp.3elektra*
