@@ -18,6 +18,7 @@ License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
 # Source0-md5:	6669e765c834e259fb7570f126b85d7e
+Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
 Patch2:		%{name}-no-deb.patch
 URL:		http://www.libelektra.org/
@@ -169,6 +170,23 @@ Bash completion for Elektra kdb command.
 
 %description -n bash-completion-elektra -l pl.UTF-8
 Bashowe uzupełnianie parametrów dla polecenai kdb z pakietu Elektra.
+
+%package -n zsh-completion-elektra
+Summary:	ZSH completion for Elektra commands
+Summary(pl.UTF-8):	Uzupełnianie parametrów dla poleceń z pakietu Elektra w powłoce ZSH
+Group:		Applications/Shells
+Requires:	%{name} = %{version}-%{release}
+Requires:	zsh
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
+
+%description -n zsh-completion-elektra
+ZSH completion for Elektra kdb command.
+
+%description -n zsh-completion-elektra -l pl.UTF-8
+Uzupełnianie parametrów dla polecenai kdb z pakietu Elektra w powłoce
+ZSH.
 
 %package libs
 Summary:	Elektra Project libraries
@@ -347,6 +365,7 @@ Wiązanie Pythona 3 GI dla Elektry.
 
 %prep
 %setup -q
+%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 
@@ -615,6 +634,10 @@ rm -rf $RPM_BUILD_ROOT
 %files -n bash-completion-elektra
 %defattr(644,root,root,755)
 /etc/bash_completion.d/kdb
+
+%files -n zsh-completion-elektra
+%defattr(644,root,root,755)
+%{_datadir}/zsh/site-functions/_kdb
 
 %files libs
 %defattr(644,root,root,755)
