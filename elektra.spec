@@ -1,13 +1,15 @@
-# TODO: use system nickel (in src/plugins/ni), inih (src/plugins/ini)
+# TODO: use system nickel (1.1.0, in src/plugins/ni), inih (r29, src/plugins/ini)
 #
 # Conditonal build:
-%bcond_with	full	# "full" variant (libelektra-full with all plugins linked in)
-%bcond_without	java	# Java support: JNA binding and JNI plugin (needs Java 8)
-%bcond_without	glib	# GLib/GObject binding
-%bcond_without	lua	# Lua (5.2) support: binding and plugin
-%bcond_without	python2	# Python 2 support: binding and plugin
-%bcond_without	python3	# Python 3 support: binding and plugin
-%bcond_without	qt	# Qt GUI
+%bcond_with	full		# "full" variant (libelektra-full with all plugins linked in)
+%bcond_without	glib		# GLib/GObject/GSetttings (+ GI) bindings
+%bcond_with	gsettings	# GSetttings module (experimental)
+%bcond_without	java		# Java support: JNA binding and JNI plugin (needs Java 8)
+%bcond_without	lua		# Lua (5.2) support: bindings and plugin
+%bcond_without	python2		# Python 2 support: bindings and plugin
+%bcond_without	python3		# Python 3 support: bindings and plugin
+%bcond_without	qt		# Qt GUI
+%bcond_without	ruby		# Ruby binding
 
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
@@ -23,16 +25,18 @@ Patch1:		%{name}-no-markdown.patch
 Patch2:		%{name}-no-deb.patch
 URL:		http://www.libelektra.org/
 %if %{with qt}
-BuildRequires:	Qt5Core-devel >= 5
-BuildRequires:	Qt5Gui-devel >= 5
-BuildRequires:	Qt5Qml-devel >= 5
-BuildRequires:	Qt5Quick-devel >= 5
-BuildRequires:	Qt5Test-devel >= 5
-BuildRequires:	Qt5Widgets-devel >= 5
+BuildRequires:	Qt5Core-devel >= 5.3
+BuildRequires:	Qt5Gui-devel >= 5.3
+BuildRequires:	Qt5Qml-devel >= 5.3
+BuildRequires:	Qt5Quick-devel >= 5.3
+BuildRequires:	Qt5Svg-devel >= 5.3
+BuildRequires:	Qt5Test-devel >= 5.3
+BuildRequires:	Qt5Widgets-devel >= 5.3
 %endif
 BuildRequires:	augeas-devel >= 1.0
 BuildRequires:	boost-devel
-BuildRequires:	cmake >= 2.8.8
+BuildRequires:	cmake >= 2.8.11
+BuildRequires:	curl-devel
 BuildRequires:	dbus-devel
 BuildRequires:	doxygen
 BuildRequires:	gettext-tools
@@ -44,21 +48,25 @@ BuildRequires:	gettext-tools
 # jawt for plugin
 %{?with_java:BuildRequires:	jre-X11 >= 1.8}
 BuildRequires:	libgcrypt-devel
+BuildRequires:	libgit2-devel >= 0.24.1
 %{?with_qt:BuildRequires:	libmarkdown-devel}
 BuildRequires:	libstdc++-devel
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua52-devel >= 5.2}
+BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-devel >= 1:2.7}
 %{?with_python3:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	ronn
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.612
+%{?with_ruby:BuildRequires:	ruby-devel}
 BuildRequires:	swig >= 2
 %if %{with python2} || %{with python3}
 BuildRequires:	swig-python >= 2
 %endif
+%{?with_ruby:BuildRequires:	swig-ruby}
 BuildRequires:	systemd-devel
 BuildRequires:	tcl-devel
 BuildRequires:	yajl-devel
@@ -141,8 +149,8 @@ Wtyczka 2 Python dla Elektry. Pozwala na używanie wtyczek napisanych w
 Pythonie 2.
 
 %package plugin-python3
-Summary:	Python plugin for Elektra
-Summary(pl.UTF-8):	Wtyczka Python dla Elektry
+Summary:	Python 3 plugin for Elektra
+Summary(pl.UTF-8):	Wtyczka Python 3 dla Elektry
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	python3-libs >= 1:3.2
@@ -160,7 +168,7 @@ Summary:	Bash completion for Elektra commands
 Summary(pl.UTF-8):	Bashowe uzupełnianie parametrów dla poleceń z pakietu Elektra
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
-Requires:	bash-completion
+Requires:	bash-completion >= 2
 %if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
 %endif
@@ -289,7 +297,7 @@ Summary(pl.UTF-8):	Wiązanie języka Java dla Elektry
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	java-jna
-Requires:	jre
+Requires:	jre >= 1.8
 
 %description -n java-elektra
 Java binding for Elektra.
@@ -319,10 +327,12 @@ Requires:	lua52-libs >= 5.2
 #R: lua52-lgi ?
 
 %description -n lua-elektra-glib
-Lua/GI binding for Elektra.
+Lua/GI binding for Elektra. Note: this bindings is deprecated, it's
+better to use SWIG (lua-elektra) binding.
 
 %description -n lua-elektra-glib -l pl.UTF-8
-Wiązanie Lua/GI dla Elektry.
+Wiązanie Lua/GI dla Elektry. Uwaga: to wiązanie jest przestarzałe,
+lepiej używać wiązania SWIG (lua-elektra).
 
 %package -n python-elektra
 Summary:	Python 2 binding for Elektra
@@ -358,10 +368,25 @@ Requires:	%{name}-glib = %{version}-%{release}
 Requires:	python3-pygobject3 >= 3
 
 %description -n python3-elektra-glib
-Python 3 GI binding for Elektra.
+Python 3 GI binding for Elektra. Note: this bindings is deprecated,
+it's better to use SWIG (python*-elektra) binding.
+
 
 %description -n python3-elektra-glib -l pl.UTF-8
-Wiązanie Pythona 3 GI dla Elektry.
+Wiązanie Pythona 3 GI dla Elektry. Uwaga: to wiązanie jest
+przestarzałe, lepiej używać wiązania SWIG (python*-elektra).
+
+%package -n ruby-elektra
+Summary:	Ruby binding for Elektra
+Summary(pl.UTF-8):	Wiązanie języka Ruby dla Elektry
+Group:		Libraries
+Requires:	%{name}-libs = %{version}-%{release}
+
+%description -n ruby-elektra
+Ruby binding for Elektra.
+
+%description -n ruby-elektra -l pl.UTF-8
+Wiązanie języka Ruby dla Elektry.
 
 %prep
 %setup -q
@@ -373,7 +398,7 @@ Wiązanie Pythona 3 GI dla Elektry.
 install -d build
 cd build
 %cmake .. \
-	-DBINDINGS="cpp%{?with_glib:;glib%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}" \
+	-DBINDINGS="INTERCEPT;cpp%{?with_glib:;glib%{?with_gsettings:;gsettings}%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}%{?with_ruby:;swig_ruby}" \
 	%{!?with_full:-DBUILD_FULL=OFF} \
 	-DINSTALL_TESTING=FALSE \
 	-DPLUGINS=ALL \
@@ -389,10 +414,10 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} -C build install \
 	DESTDIR=$RPM_BUILD_ROOT
 
-install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
+# unneeded compat symlink
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libelektragetenv.so.0
 
-install -d $RPM_BUILD_ROOT/etc/bash_completion.d
-%{__mv} $RPM_BUILD_ROOT{%{bash_compdir}/kdb,/etc/bash_completion.d/kdb}
+install -D src/plugins/xmltool/xmlschema/elektra.xsd $RPM_BUILD_ROOT%{_datadir}/sgml/elektra/elektra.xsd
 
 %if %{with python2}
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
@@ -433,14 +458,14 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc doc/{AUTHORS,DESIGN.md,GOALS.md,NEWS.md,SECURITY.md,todo}
+%doc doc/{AUTHORS,BIGPICTURE.md,DESIGN.md,GOALS.md,LICENSE.md,NEWS.md,SECURITY.md,WHY.md,todo}
 # doc/standards installed-doc/scripts
 %attr(755,root,root) %{_bindir}/kdb
 %if %{with full}
 %attr(755,root,root) %{_bindir}/kdb-full
 %endif
 %dir %{_libdir}/elektra
-# R: augeas-libs
+# R: augeas-libs libxml2
 %attr(755,root,root) %{_libdir}/elektra/libelektra-augeas.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-base64.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-blockresolver.so
@@ -451,10 +476,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-conditionals.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-constants.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-counter.so
+# TODO: R: botan
+#%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_botan.so
 # R: libgcrypt
 %attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_gcrypt.so
+# R: openssl
 %attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_openssl.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-csvstorage.so
+# R: curl-libs
 %attr(755,root,root) %{_libdir}/elektra/libelektra-curlget.so
 # R: dbus
 %attr(755,root,root) %{_libdir}/elektra/libelektra-dbus.so
@@ -467,6 +496,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-fcrypt.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-filecheck.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-fstab.so
+# R: libgit2 >= 0.24.1
 %attr(755,root,root) %{_libdir}/elektra/libelektra-gitresolver.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-glob.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hexcode.so
@@ -538,6 +568,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/setupProxy
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/ffconfig/writeConfigFiles
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/find-tools
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/getenv
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/install-sh-completion
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/list-tools
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/mount-augeas
@@ -553,6 +584,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/kdb-convert.1*
 %{_mandir}/man1/kdb-cp.1*
 %{_mandir}/man1/kdb-editor.1*
+%{_mandir}/man1/kdb-elektrify-getenv.1*
 %{_mandir}/man1/kdb-export.1*
 %{_mandir}/man1/kdb-file.1*
 %{_mandir}/man1/kdb-find-tools.1*
@@ -595,6 +627,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files gui
 %defattr(644,root,root,755)
+%doc src/tools/qt-gui/README.md
 %attr(755,root,root) %{_bindir}/elektra-qt-editor
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/qt-gui
 %{_datadir}/appdata/org.libelektra.elektra-qt-editor.appdata.xml
@@ -633,7 +666,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -n bash-completion-elektra
 %defattr(644,root,root,755)
-/etc/bash_completion.d/kdb
+%{bash_compdir}/kdb
 
 %files -n zsh-completion-elektra
 %defattr(644,root,root,755)
@@ -655,6 +688,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %ghost %{_libdir}/libelektra-plugin.so.4
 %attr(755,root,root) %{_libdir}/libelektra-proposal.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-proposal.so.4
+%attr(755,root,root) %{_libdir}/libelektraintercept-env.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektraintercept-env.so.0
+%attr(755,root,root) %{_libdir}/libelektraintercept-fs.so
 %attr(755,root,root) %{_libdir}/libelektratools.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektratools.so.2
 %if %{with full}
@@ -672,6 +708,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libelektra-meta.so
 %attr(755,root,root) %{_libdir}/libelektra-plugin.so
 %attr(755,root,root) %{_libdir}/libelektra-proposal.so
+%attr(755,root,root) %{_libdir}/libelektragetenv.so
+%attr(755,root,root) %{_libdir}/libelektraintercept-env.so
+%attr(755,root,root) %{_libdir}/libelektraintercept.so
 %attr(755,root,root) %{_libdir}/libelektratools.so
 %if %{with full}
 %attr(755,root,root) %{_libdir}/libelektra-full.so
@@ -710,6 +749,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files cpp-devel
 %defattr(644,root,root,755)
+%doc src/bindings/cpp/README.md
 %{_includedir}/elektra/*.hpp
 %{_includedir}/elektra/helper
 %{_includedir}/elektra/merging
@@ -777,7 +817,11 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with glib}
 %files glib
 %defattr(644,root,root,755)
+%doc src/bindings/glib/README.md
 %attr(755,root,root) %{_libdir}/libgelektra-4.0.so
+%if %{with gsettings}
+%attr(755,root,root) %{_libdir}/gio/modules/libelektrasettings.so
+%endif
 %{_libdir}/girepository-1.0/GElektra-4.0.typelib
 
 %files glib-devel
@@ -790,6 +834,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with java}
 %files -n java-elektra
 %defattr(644,root,root,755)
+%doc src/bindings/jna/README.md
 %{_javadir}/libelektra-1.jar
 %{_javadir}/libelektra.jar
 %endif
@@ -797,11 +842,13 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with lua}
 %files -n lua-elektra
 %defattr(644,root,root,755)
+%doc src/bindings/swig/lua/README.md
 %attr(755,root,root) %{_libdir}/lua/5.2/kdb.so
 
 %if %{with glib}
 %files -n lua-elektra-glib
 %defattr(644,root,root,755)
+%doc src/bindings/gi/lua/README.md
 %dir %{_datadir}/lua/5.2/lgi
 %dir %{_datadir}/lua/5.2/lgi/override
 %{_datadir}/lua/5.2/lgi/override/GElektra.lua
@@ -811,6 +858,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python2}
 %files -n python-elektra
 %defattr(644,root,root,755)
+%doc src/bindings/swig/python2/README.md
 %attr(755,root,root) %{py_sitedir}/_kdb.so
 %{py_sitedir}/kdb.py[co]
 %endif
@@ -818,6 +866,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with python3}
 %files -n python3-elektra
 %defattr(644,root,root,755)
+%doc src/bindings/swig/python/README.md
 %attr(755,root,root) %{py3_sitedir}/_kdb.so
 %{py3_sitedir}/kdb.py
 %{py3_sitedir}/__pycache__/kdb.cpython-*.py[co]
@@ -825,7 +874,16 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with glib}
 %files -n python3-elektra-glib
 %defattr(644,root,root,755)
+%doc src/bindings/gi/python/README.md
 %{py3_sitedir}/gi/overrides/GElektra.py
 %{py3_sitedir}/gi/overrides/__pycache__/GElektra.cpython-*.py[co]
 %endif
+%endif
+
+%if %{with ruby}
+%files -n ruby-elektra
+%defattr(644,root,root,755)
+%doc src/bindings/swig/ruby/README.md
+%attr(755,root,root) %{ruby_vendorarchdir}/_kdb.so
+%{ruby_vendorlibdir}/kdb.rb
 %endif
