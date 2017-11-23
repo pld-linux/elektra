@@ -15,7 +15,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.19
-Release:	5
+Release:	6
 License:	BSD
 Group:		Applications/System
 Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -23,6 +23,7 @@ Source0:	http://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.g
 Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
 Patch2:		%{name}-no-deb.patch
+Patch3:		cmake.patch
 URL:		http://www.libelektra.org/
 %if %{with qt}
 BuildRequires:	Qt5Core-devel >= 5.3
@@ -393,6 +394,7 @@ Wiązanie języka Ruby dla Elektry.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 install -d build
