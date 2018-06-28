@@ -1,14 +1,16 @@
-# TODO: use system nickel (1.1.0, in src/plugins/ni), inih (r29, src/plugins/ini)
+# TODO:
+# - force maven to work without network, enable java
 # - haskell plugin (BR: ghc >= 8.0.0, cabal)
 # - rest-backend (BR: cppcms boost >= 1.45 libjwt openssl)
 # - rest-frontend, web (BR: npm)
+# - use system nickel (1.1.0, in src/plugins/ni), inih (r29, src/plugins/ini)
 #
 # Conditonal build:
 %bcond_with	full		# "full" variant (libelektra-full with all plugins linked in)
 %bcond_without	gen		# gen tool packaging
 %bcond_without	glib		# GLib/GObject/GSetttings (+ GI) bindings
 %bcond_without	gsettings	# GSetttings module
-%bcond_without	java		# Java support: JNA binding and JNI plugin (needs Java 8)
+%bcond_with	java		# Java support: JNA binding and JNI plugin (needs Java 8)
 %bcond_without	lua		# Lua (5.2) support: bindings and plugin
 %bcond_without	python2		# Python 2 support: bindings and plugin
 %bcond_without	python3		# Python 3 support: bindings and plugin
@@ -51,7 +53,8 @@ BuildRequires:	gettext-tools
 %{?with_gsettings:BuildRequires:	glib2-devel >= 1:2.42}
 %{?with_glib:BuildRequires:	gobject-introspection-devel >= 1.38}
 # for binding
-%{?with_java:BuildRequires:	java-jna}
+%{?with_java:BuildRequires:	java-jna >= 4.5.0}
+%{?with_java:BuildRequires:	java-junit >= 4.12}
 %{?with_java:BuildRequires:	jdk >= 1.8}
 # jawt for plugin
 %{?with_java:BuildRequires:	jre-X11 >= 1.8}
@@ -64,6 +67,8 @@ BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua52-devel >= 5.2}
 %{?with_java:BuildRequires:	maven}
+%{?with_java:BuildRequires:	maven-plugin-compiler >= 3.6.0}
+%{?with_java:BuildRequires:	maven-plugin-surefire >= 2.19.1}
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-devel >= 1:2.7}
