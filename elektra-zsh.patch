@@ -1,11 +1,11 @@
---- elektra-0.8.19/scripts/CMakeLists.txt.orig	2016-11-22 21:59:21.000000000 +0100
-+++ elektra-0.8.19/scripts/CMakeLists.txt	2017-02-28 21:15:22.500779617 +0100
-@@ -61,7 +61,7 @@
+--- elektra-0.8.23/scripts/CMakeLists.txt.orig	2018-06-21 21:19:48.567341007 +0200
++++ elektra-0.8.23/scripts/CMakeLists.txt	2018-06-21 21:20:44.280673708 +0200
+@@ -77,7 +77,7 @@
  	else ()
+ 
  		# This Folder is at least the valid folder for Debian
- 		install (FILES kdb_zsh_completion
--			DESTINATION /usr/share/zsh/vendor-completions
-+			DESTINATION /usr/share/zsh/site-functions
- 			RENAME _kdb)
+-		install (FILES kdb_zsh_completion DESTINATION /usr/share/zsh/vendor-completions RENAME _kdb)
++		install (FILES kdb_zsh_completion DESTINATION /usr/share/zsh/site-functions RENAME _kdb)
  	endif ()
- endif()
+ endif ()
+ 
