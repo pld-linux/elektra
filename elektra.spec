@@ -1,5 +1,5 @@
 # TODO:
-# - force maven to work without network, enable java
+# - force maven to work without network, enable java_mvn
 # - haskell plugin (BR: ghc >= 8.0.0, cabal)
 # - rest-backend (BR: cppcms boost >= 1.45 libjwt openssl)
 # - rest-frontend, web (BR: npm)
@@ -10,7 +10,8 @@
 %bcond_without	gen		# gen tool packaging
 %bcond_without	glib		# GLib/GObject/GSetttings (+ GI) bindings
 %bcond_without	gsettings	# GSetttings module
-%bcond_with	java		# Java support: JNA binding and JNI plugin (needs Java 8)
+%bcond_without	java		# Java support: JNA binding and JNI plugin (needs Java 8)
+%bcond_with	java_mvn	# Java JNA binding (needs Java 8 and maven)
 %bcond_without	lua		# Lua (5.2) support: bindings and plugin
 %bcond_without	python2		# Python 2 support: bindings and plugin
 %bcond_without	python3		# Python 3 support: bindings and plugin
@@ -20,11 +21,14 @@
 %if %{without glib}
 %undefine	with_gsettings
 %endif
+%if %{without java}
+%undefine	with_java_mvn}
+%endif
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.23
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -53,8 +57,8 @@ BuildRequires:	gettext-tools
 %{?with_gsettings:BuildRequires:	glib2-devel >= 1:2.42}
 %{?with_glib:BuildRequires:	gobject-introspection-devel >= 1.38}
 # for binding
-%{?with_java:BuildRequires:	java-jna >= 4.5.0}
-%{?with_java:BuildRequires:	java-junit >= 4.12}
+%{?with_java_mvn:BuildRequires:	java-jna >= 4.5.0}
+%{?with_java_mvn:BuildRequires:	java-junit >= 4.12}
 %{?with_java:BuildRequires:	jdk >= 1.8}
 # jawt for plugin
 %{?with_java:BuildRequires:	jre-X11 >= 1.8}
@@ -66,9 +70,9 @@ BuildRequires:	libuv-devel
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	libxslt-progs
 %{?with_lua:BuildRequires:	lua52-devel >= 5.2}
-%{?with_java:BuildRequires:	maven}
-%{?with_java:BuildRequires:	maven-plugin-compiler >= 3.6.0}
-%{?with_java:BuildRequires:	maven-plugin-surefire >= 2.19.1}
+%{?with_java_mvn:BuildRequires:	maven}
+%{?with_java_mvn:BuildRequires:	maven-plugin-compiler >= 3.6.0}
+%{?with_java_mvn:BuildRequires:	maven-plugin-surefire >= 2.19.1}
 BuildRequires:	openssl-devel
 BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-devel >= 1:2.7}
@@ -422,7 +426,7 @@ Summary:	Java binding for Elektra
 Summary(pl.UTF-8):	Wiązanie języka Java dla Elektry
 Group:		Libraries
 Requires:	%{name}-libs = %{version}-%{release}
-Requires:	java-jna
+Requires:	java-jna >= 4.5.0
 Requires:	jre >= 1.8
 
 %description -n java-elektra
@@ -526,7 +530,7 @@ Wiązanie języka Ruby dla Elektry.
 install -d build
 cd build
 %cmake .. \
-	-DBINDINGS="INTERCEPT;cpp;io_uv%{?with_glib:;glib;io_glib%{?with_gsettings:;gsettings}%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}%{?with_ruby:;swig_ruby}" \
+	-DBINDINGS="INTERCEPT;cpp;io_uv%{?with_glib:;glib;io_glib%{?with_gsettings:;gsettings}%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java_mvn:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}%{?with_ruby:;swig_ruby}" \
 	%{!?with_full:-DBUILD_FULL=OFF} \
 	-DINSTALL_TESTING=FALSE \
 	-DPLUGINS=ALL \
@@ -578,7 +582,7 @@ install -d installed-doc
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{benchmark_crypto_comparison,benchmark_plugins,examples_backend}.cpp.3elektra
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/std_hash_*_.3elektra
 
-%if %{without java}
+%if %{without java_mvn}
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/org_libelektra_*.3elektra
 %endif
 
@@ -801,6 +805,7 @@ rm -rf $RPM_BUILD_ROOT
 %{py_sitedir}/elektra_gen-%{version}-py*.egg-info
 # FIXME: should be in elektra_gen subdir
 %{py_sitedir}/support
+%dir %{_datadir}/elektra
 %{_datadir}/elektra/templates
 %{_mandir}/man1/kdb-gen.1*
 %endif
@@ -1091,7 +1096,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/kdbio_uv.h
 %{_pkgconfigdir}/elektra-io-uv.pc
 
-%if %{with java}
+%if %{with java_mvn}
 %files -n java-elektra
 %defattr(644,root,root,755)
 %doc src/bindings/jna/README.md
