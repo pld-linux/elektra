@@ -223,9 +223,7 @@ Summary(pl.UTF-8):	Bashowe uzupełnianie parametrów dla poleceń z pakietu Elek
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	bash-completion >= 2
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n bash-completion-elektra
 Bash completion for Elektra kdb command.
@@ -239,9 +237,7 @@ Summary(pl.UTF-8):	Uzupełnianie parametrów w fish dla poleceń z pakietu Elekt
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	fish
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n fish-completion-elektra
 Fish completion for Elektra kdb command.
@@ -255,9 +251,7 @@ Summary(pl.UTF-8):	Uzupełnianie parametrów dla poleceń z pakietu Elektra w po
 Group:		Applications/Shells
 Requires:	%{name} = %{version}-%{release}
 Requires:	zsh
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description -n zsh-completion-elektra
 ZSH completion for Elektra kdb command.
