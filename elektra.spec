@@ -22,7 +22,7 @@
 %undefine	with_gsettings
 %endif
 %if %{without java}
-%undefine	with_java_mvn}
+%undefine	with_java_mvn
 %endif
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
@@ -399,7 +399,7 @@ Requires:	%{name}-libs = %{version}-%{release}
 %description io-uv
 Elektra I/O binding using uv.
 
-%description io-glib -l pl.UTF-8
+%description io-uv -l pl.UTF-8
 Wiązanie we/wy Elektry wykorzystujące uv.
 
 %package io-uv-devel
