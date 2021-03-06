@@ -28,7 +28,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.23
-Release:	12
+Release:	13
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -956,7 +956,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/dbus.c.3elektra*
 %{_mandir}/man3/deprecated.3elektra*
 %{_mandir}/man3/global.c.3elektra*
-%{_mandir}/man3/invoke.3elektra*
 %{_mandir}/man3/invoke.c.3elektra*
 %{_mandir}/man3/io.c.3elektra*
 %{_mandir}/man3/io_doc.c.3elektra*
