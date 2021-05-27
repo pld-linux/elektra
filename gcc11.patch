@@ -1,0 +1,10 @@
+--- elektra-0.8.23.orig/src/tools/kdb/cmdline.cpp	2018-05-13 18:57:57.000000000 +0200
++++ elektra-0.8.23/src/tools/kdb/cmdline.cpp	2021-05-28 00:53:03.152527591 +0200
+@@ -16,6 +16,7 @@
+ 
+ #include <cstdio>
+ #include <iostream>
++#include <limits>
+ #include <set>
+ #include <vector>
+ 
