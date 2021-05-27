@@ -28,7 +28,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.23
-Release:	14
+Release:	15
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -94,6 +94,7 @@ BuildRequires:	tcl-devel
 BuildRequires:	xerces-c-devel >= 3.0.0
 BuildRequires:	yajl-devel
 BuildRequires:	yaml-cpp-devel >= 0.5
+BuildConflicts:	java-gnu-classpath
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	mktemp
 # plugins dependencies (move to individual plugin subpackage if created)
