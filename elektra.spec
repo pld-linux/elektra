@@ -80,6 +80,7 @@ BuildRequires:	pkgconfig
 %{?with_python2:BuildRequires:	python-devel >= 1:2.7}
 %{?with_python3:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	ronn
+BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.612
 %{?with_ruby:BuildRequires:	ruby-devel}
@@ -102,7 +103,7 @@ Requires:	augeas-libs >= 1.0
 Requires:	curl-libs >= 7.28.0
 Requires:	libgit2 >= 0.24.1
 Requires:	yaml-cpp >= 0.5
-Obsoletes:	registry
+Obsoletes:	registry < 0.4
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -268,6 +269,7 @@ Summary:	Elektra Project libraries
 Summary(pl.UTF-8):	Biblioteki projektu Elektra
 Group:		Libraries
 Obsoletes:	elektra-cpp < 0.8
+Obsoletes:	registry-libs < 0.4
 Conflicts:	elektra < 0.7
 
 %description libs
@@ -297,6 +299,8 @@ Summary:	Include files and API documentation for Elektra Project
 Summary(pl.UTF-8):	Pliki nagłówkowe i dokumentacja API projektu Elektra
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+Obsoletes:	registry-devel < 0.4
+Obsoletes:	registry-examples < 0.4
 
 %description devel
 This package contains the include files and API manual pages to use
@@ -954,6 +958,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_pkgconfigdir}/elektra-notification.pc
 %{_datadir}/cmake/Modules/ElektraConfig*.cmake
 %{_datadir}/cmake/Modules/ElektraTargetsLibelektra*.cmake
+%{_mandir}/man3/Invoke.3elektra*
 %{_mandir}/man3/Opmphm*.3elektra*
 %{_mandir}/man3/api.3elektra*
 %{_mandir}/man3/dbus.c.3elektra*
