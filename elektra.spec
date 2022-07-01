@@ -1,4 +1,5 @@
 # TODO:
+# - subpackage crypto modules? (-plugin-crypto_{botan,gcrypt,openssl} or so)
 # - force maven to work without network, enable java_mvn
 # - haskell plugin (BR: ghc >= 8.0.0, cabal)
 # - rest-backend (BR: cppcms boost >= 1.45 libjwt openssl)
@@ -28,7 +29,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.8.23
-Release:	20
+Release:	21
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
@@ -49,6 +50,7 @@ BuildRequires:	Qt5Widgets-devel >= 5.3
 %endif
 BuildRequires:	augeas-devel >= 1.0
 BuildRequires:	boost-devel
+BuildRequires:	botan2-devel
 BuildRequires:	cmake >= 3.0
 BuildRequires:	curl-devel >= 7.28.0
 BuildRequires:	dbus-devel
@@ -629,8 +631,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-conditionals.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-constants.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-counter.so
-# TODO: R: botan
-#%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_botan.so
+# R: botan
+%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_botan.so
 # R: libgcrypt
 %attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_gcrypt.so
 # R: openssl
@@ -958,7 +960,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_pkgconfigdir}/elektra-notification.pc
 %{_datadir}/cmake/Modules/ElektraConfig*.cmake
 %{_datadir}/cmake/Modules/ElektraTargetsLibelektra*.cmake
-%{_mandir}/man3/Invoke.3elektra*
+# FIXME: x86_64 doxygen uses lower case, while the other use upper, needs investigation
+%{_mandir}/man3/[Ii]nvoke.3elektra*
 %{_mandir}/man3/Opmphm*.3elektra*
 %{_mandir}/man3/api.3elektra*
 %{_mandir}/man3/dbus.c.3elektra*
