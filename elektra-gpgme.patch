@@ -1,0 +1,32 @@
+Avoid:
+CMake Error in src/plugins/gpgme/CMakeLists.txt:
+  Found relative path while evaluating include directories of
+  "elektra-gpgme-objects":
+
+    "-D_FILE_OFFSET_BITS=64"
+
+--- elektra-0.8.26/cmake/Modules/FindLibGpgme.cmake.orig	2019-02-26 12:45:46.000000000 +0100
++++ elektra-0.8.26/cmake/Modules/FindLibGpgme.cmake	2022-07-03 17:45:45.536033437 +0200
+@@ -52,10 +52,13 @@ if (LIBGPGME_FOUND)
+ 	string (LENGTH "${LIBGPGME_CFLAGS}"
+ 		       LIBGPGME_CFLAGS_LEN)
+ 	if (${LIBGPGME_CFLAGS_LEN} GREATER 1)
++		string (REGEX REPLACE "-D[A-Za-z0-9_=]* *" ""
++			LIBGPGME_INCLUDE_DIRS
++			"${LIBGPGME_CFLAGS}")
+ 		string (REPLACE "-I"
+ 				""
+ 				LIBGPGME_INCLUDE_DIRS
+-				"${LIBGPGME_CFLAGS}")
++				"${LIBGPGME_INCLUDE_DIRS}")
+ 		string (REPLACE " "
+ 				";"
+ 				LIBGPGME_INCLUDE_DIRS
+--- elektra-0.8.26/src/plugins/gpgme/CMakeLists.txt.orig	2019-02-26 12:45:46.000000000 +0100
++++ elektra-0.8.26/src/plugins/gpgme/CMakeLists.txt	2022-07-03 18:16:30.609371151 +0200
+@@ -11,4 +11,4 @@ endif ()
+ 
+ set (GPGME_SOURCE_FILES keylist.h keylist.c gpgme.h gpgme.c)
+ 
+-add_plugin (gpgme SOURCES ${GPGME_SOURCE_FILES} INCLUDE_DIRECTORIES ${LIBGPGME_INCLUDE_DIRS} LINK_LIBRARIES ${LIBGPGME_LIBRARIES} ADD_TEST)
++add_plugin (gpgme SOURCES ${GPGME_SOURCE_FILES} INCLUDE_DIRECTORIES ${LIBGPGME_INCLUDE_DIRS} LINK_LIBRARIES ${LIBGPGME_LIBRARIES} COMPILE_DEFINITIONS "_FILE_OFFSET_BITS=64" ADD_TEST)

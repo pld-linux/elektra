@@ -28,16 +28,18 @@
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.8.23
-Release:	22
+Version:	0.8.26
+Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	0a065ed381a59b6213bd46fd3c82ba83
+# Source0-md5:	4ef202b5d421cc497ef05221e5309ebc
 Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
 Patch2:		disable-broken-tests.patch
 Patch3:		gcc11.patch
+Patch4:		%{name}-gpgme.patch
+Patch5:		%{name}-jni.patch
 URL:		https://www.libelektra.org/
 %if %{with qt}
 BuildRequires:	Qt5Core-devel >= 5.3
@@ -60,6 +62,7 @@ BuildRequires:	gettext-tools
 %{?with_glib:BuildRequires:	glib2-devel >= 1:2.36}
 %{?with_gsettings:BuildRequires:	glib2-devel >= 1:2.42}
 %{?with_glib:BuildRequires:	gobject-introspection-devel >= 1.38}
+BuildRequires:	gpgme-devel >= 1.10
 # for binding
 %{?with_java_mvn:BuildRequires:	java-jna >= 4.5.0}
 %{?with_java_mvn:BuildRequires:	java-junit >= 4.12}
@@ -97,6 +100,8 @@ BuildRequires:	tcl-devel
 BuildRequires:	xerces-c-devel >= 3.0.0
 BuildRequires:	yajl-devel
 BuildRequires:	yaml-cpp-devel >= 0.5
+BuildRequires:	zeromq-devel >= 3.2
+BuildRequires:	zlib-devel
 BuildConflicts:	java-gnu-classpath
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	mktemp
@@ -527,8 +532,11 @@ Wiązanie języka Ruby dla Elektry.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env bash,/bin/bash,' $(grep -l '/usr/bin/env bash' -r scripts)
+%{__sed} -i -e '1s,/usr/bin/env sh,/bin/sh,' scripts/check-env-dep
 %{__sed} -i -e '1s,/usr/bin/env python,%{__python},' scripts/{find-tools,update-infos-status}
 
 %{__rm} -r src/bindings/io/test
@@ -542,6 +550,7 @@ cd build
 	-DBINDINGS="INTERCEPT;cpp;io_uv%{?with_glib:;glib;io_glib%{?with_gsettings:;gsettings}%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java_mvn:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}%{?with_ruby:;swig_ruby}" \
 	%{!?with_full:-DBUILD_FULL=OFF} \
 	-DINSTALL_TESTING=FALSE \
+	%{?with_glib:-DIS_GLIB_ADDED=ON} \
 	-DPLUGINS=ALL \
 	-DTARGET_CMAKE_FOLDER=%{_datadir}/cmake/Modules \
 	-DTOOLS="kdb;race%{?with_gen:;gen}%{?with_qt:;qt-gui}" \
@@ -583,11 +592,11 @@ install -d installed-doc
 %{__rm} -r $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 # these don't belong to man3
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{README_md,doc_*_md,md_doc_*,md_src_*,md_scripts_README,src_libs_{getenv,notification_example}_README_md}.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{CODING.md,README_md,doc_*_md,md_doc_*,md_src_*,scripts_README_md,src_libs{,_getenv,_highlevel}_README_md,src_plugins_README_md}.3elektra
 # internal or example, not part of API
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{DocBindingData,DocOperationData,SomeIoLibHandle}.3elektra
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/doc.h.3elektra
-%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{array,backend,dl,doc,ease_keyname,elektra_{keyname,plugin,proposal},example_notification*,exportsymbols,functional,internal,kdbenum,log,markdownlinkconverter,meta,mount,nolog,owner,plugin_plugin,proposal_proposal,split,static,testio_doc,testlib_notification,trie,try_compile_dbus}.c.3elektra
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{array,backend,dl,doc,ease_keyname,elektra_{keyname,plugin,proposal},exportsymbols,functional,internal,kdbenum,log,markdownlinkconverter,meta,mount,nolog,owner,plugin_plugin,proposal_proposal,split,static,testio_doc,testlib_notification,testlib_pluginprocess,trie,try_compile_{dbus,zeromq}}.c.3elektra
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/{benchmark_crypto_comparison,benchmark_plugins,examples_backend}.cpp.3elektra
 %{__rm} $RPM_BUILD_ROOT%{_mandir}/man3/std_hash_*_.3elektra
 
@@ -631,6 +640,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-conditionals.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-constants.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-counter.so
+# R: libstdc++
+%attr(755,root,root) %{_libdir}/elektra/libelektra-cpptemplate.so
 # R: botan
 %attr(755,root,root) %{_libdir}/elektra/libelektra-crypto_botan.so
 # R: libgcrypt
@@ -660,7 +671,10 @@ rm -rf $RPM_BUILD_ROOT
 # R: libgit2 >= 0.24.1
 %attr(755,root,root) %{_libdir}/elektra/libelektra-gitresolver.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-glob.so
+# R: gpgme
+%attr(755,root,root) %{_libdir}/elektra/libelektra-gpgme.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hexcode.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-hexnumber.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hidden.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-hosts.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-iconv.so
@@ -678,6 +692,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-logchange.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-mathcheck.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-mini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-mmapstorage.so
+# R: zlib
+%attr(755,root,root) %{_libdir}/elektra/libelektra-mmapstorage_crc.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-mozprefs.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-multifile.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-network.so
@@ -687,8 +704,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-null.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-passwd.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-path.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-process.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-profile.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-range.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-reference.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-regexstore.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-rename.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-resolver.so
@@ -717,8 +736,16 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-xmltool.so
 # R: yajl
 %attr(755,root,root) %{_libdir}/elektra/libelektra-yajl.so
+# R: libstdc++
+%attr(755,root,root) %{_libdir}/elektra/libelektra-yambi.so
 # R: yaml-cpp >= 0.5
 %attr(755,root,root) %{_libdir}/elektra/libelektra-yamlcpp.so
+# R: libstdc++
+%attr(755,root,root) %{_libdir}/elektra/libelektra-yamlsmith.so
+# R: zeromq
+%attr(755,root,root) %{_libdir}/elektra/libelektra-zeromqrecv.so
+# R: zeromq
+%attr(755,root,root) %{_libdir}/elektra/libelektra-zeromqsend.so
 %dir %{_libdir}/elektra/tool_exec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/backup
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/benchmark-createtree
@@ -771,6 +798,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/kdb-elektrify-getenv.1*
 %{_mandir}/man1/kdb-export.1*
 %{_mandir}/man1/kdb-file.1*
+%{_mandir}/man1/kdb-find.1*
 %{_mandir}/man1/kdb-find-tools.1*
 %{_mandir}/man1/kdb-fstab.1*
 %{_mandir}/man1/kdb-get.1*
@@ -885,16 +913,22 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %ghost %{_libdir}/libelektra-core.so.4
 %attr(755,root,root) %{_libdir}/libelektra-ease.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-ease.so.4
+%attr(755,root,root) %{_libdir}/libelektra-globbing.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-globbing.so.4
+%attr(755,root,root) %{_libdir}/libelektra-highlevel.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-highlevel.so.4
 %attr(755,root,root) %{_libdir}/libelektra-invoke.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-invoke.so.4
+%attr(755,root,root) %{_libdir}/libelektra-io.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-io.so.4
 %attr(755,root,root) %{_libdir}/libelektra-kdb.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-kdb.so.4
 %attr(755,root,root) %{_libdir}/libelektra-meta.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-meta.so.4
-%attr(755,root,root) %{_libdir}/libelektra-io.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libelektra-io.so.4
 %attr(755,root,root) %{_libdir}/libelektra-notification.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-notification.so.4
+%attr(755,root,root) %{_libdir}/libelektra-opts.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-opts.so.4
 %attr(755,root,root) %{_libdir}/libelektra-plugin.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-plugin.so.4
 %attr(755,root,root) %{_libdir}/libelektra-pluginprocess.so.*.*.*
@@ -919,11 +953,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libelektra.so
 %attr(755,root,root) %{_libdir}/libelektra-core.so
 %attr(755,root,root) %{_libdir}/libelektra-ease.so
-%attr(755,root,root) %{_libdir}/libelektra-kdb.so
+%attr(755,root,root) %{_libdir}/libelektra-globbing.so
+%attr(755,root,root) %{_libdir}/libelektra-highlevel.so
 %attr(755,root,root) %{_libdir}/libelektra-invoke.so
 %attr(755,root,root) %{_libdir}/libelektra-io.so
+%attr(755,root,root) %{_libdir}/libelektra-kdb.so
 %attr(755,root,root) %{_libdir}/libelektra-meta.so
 %attr(755,root,root) %{_libdir}/libelektra-notification.so
+%attr(755,root,root) %{_libdir}/libelektra-opts.so
 %attr(755,root,root) %{_libdir}/libelektra-plugin.so
 %attr(755,root,root) %{_libdir}/libelektra-pluginprocess.so
 %attr(755,root,root) %{_libdir}/libelektra-proposal.so
@@ -936,6 +973,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libelektra-full.so
 %endif
 %dir %{_includedir}/elektra
+%{_includedir}/elektra/elektra.h
+%{_includedir}/elektra/elektra
 %{_includedir}/elektra/kdb.h
 %{_includedir}/elektra/kdbconfig.h
 %{_includedir}/elektra/kdbease.h
@@ -944,9 +983,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/kdbhelper.h
 %{_includedir}/elektra/kdbinvoke.h
 %{_includedir}/elektra/kdbio.h
+%dir %{_includedir}/elektra/kdbio
 %{_includedir}/elektra/kdbmeta.h
 %{_includedir}/elektra/kdbmodule.h
 %{_includedir}/elektra/kdbnotification.h
+%{_includedir}/elektra/kdbopts.h
 %{_includedir}/elektra/kdbos.h
 %{_includedir}/elektra/kdbplugin.h
 %{_includedir}/elektra/kdbpluginprocess.h
@@ -956,6 +997,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/kdbutility.h
 %{_includedir}/elektra/kdbversion.h
 %{_pkgconfigdir}/elektra.pc
+%{_pkgconfigdir}/elektra-highlevel.pc
 %{_pkgconfigdir}/elektra-io.pc
 %{_pkgconfigdir}/elektra-notification.pc
 %{_datadir}/cmake/Modules/ElektraConfig*.cmake
@@ -964,9 +1006,21 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/[Ii]nvoke.3elektra*
 %{_mandir}/man3/Opmphm*.3elektra*
 %{_mandir}/man3/api.3elektra*
+%{_mandir}/man3/conversion.h.3elektra*
 %{_mandir}/man3/dbus.c.3elektra*
+%{_mandir}/man3/dbus.h.3elektra*
 %{_mandir}/man3/deprecated.3elektra*
+%{_mandir}/man3/elektra.c.3elektra*
+%{_mandir}/man3/elektra.h.3elektra*
+%{_mandir}/man3/elektra_array_value.c.3elektra*
+%{_mandir}/man3/elektra_conversion.c.3elektra*
+%{_mandir}/man3/elektra_error.c.3elektra*
+%{_mandir}/man3/elektra_value.c.3elektra*
+%{_mandir}/man3/error.h.3elektra*
+%{_mandir}/man3/ev.h.3elektra*
 %{_mandir}/man3/global.c.3elektra*
+%{_mandir}/man3/globbing.c.3elektra*
+%{_mandir}/man3/highlevel.3elektra*
 %{_mandir}/man3/invoke.c.3elektra*
 %{_mandir}/man3/io.c.3elektra*
 %{_mandir}/man3/io_doc.c.3elektra*
@@ -992,10 +1046,14 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/modules.3elektra*
 %{_mandir}/man3/notification.c.3elektra*
 %{_mandir}/man3/opmphm.c.3elektra*
+%{_mandir}/man3/opmphmpredictor.c.3elektra*
+%{_mandir}/man3/opts.c.3elektra*
 %{_mandir}/man3/plugin.3elektra*
 %{_mandir}/man3/pluginprocess.c.3elektra*
 %{_mandir}/man3/proposal.3elektra*
 %{_mandir}/man3/rand.c.3elektra*
+%{_mandir}/man3/zeromq.c.3elektra*
+%{_mandir}/man3/zeromq.h.3elektra*
 
 %files static
 %defattr(644,root,root,755)
@@ -1093,8 +1151,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files io-glib-devel
 %defattr(644,root,root,755)
-%{_includedir}/elektra/kdbio_glib.h
+%{_includedir}/elektra/kdbio/glib.h
 %{_pkgconfigdir}/elektra-io-glib.pc
+%{_mandir}/man3/glib.h.3elektra*
 
 %files io-uv
 %defattr(644,root,root,755)
@@ -1103,8 +1162,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files io-uv-devel
 %defattr(644,root,root,755)
-%{_includedir}/elektra/kdbio_uv.h
+%{_includedir}/elektra/kdbio/uv.h
 %{_pkgconfigdir}/elektra-io-uv.pc
+%{_mandir}/man3/uv.h.3elektra*
 
 %if %{with java_mvn}
 %files -n java-elektra

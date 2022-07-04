@@ -1,8 +1,8 @@
---- elektra-0.8.23/cmake/Modules/FindDiscount.cmake.orig	2018-06-21 21:21:05.117340135 +0200
-+++ elektra-0.8.23/cmake/Modules/FindDiscount.cmake	2018-06-21 21:52:21.290652045 +0200
-@@ -64,7 +64,7 @@
- 	# ____________________________________________________________________________
- 	# Actions taken when all components have been found
+--- elektra-0.8.26/cmake/Modules/FindDiscount.cmake.orig	2022-07-03 17:23:48.529834939 +0200
++++ elektra-0.8.26/cmake/Modules/FindDiscount.cmake	2022-07-03 17:26:08.972407429 +0200
+@@ -72,7 +72,7 @@ if (NOT DISCOUNT_FOUND)
+ 
+ 	# ____________________________________________________________________________ Actions taken when all components have been found
  
 -	find_package_handle_standard_args (DISCOUNT DEFAULT_MSG DISCOUNT_LIBRARIES DISCOUNT_INCLUDES MARKDOWN_EXECUTABLE)
 +	find_package_handle_standard_args (DISCOUNT DEFAULT_MSG DISCOUNT_LIBRARIES DISCOUNT_INCLUDES)
