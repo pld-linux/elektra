@@ -40,6 +40,7 @@ Patch2:		disable-broken-tests.patch
 Patch3:		gcc11.patch
 Patch4:		%{name}-gpgme.patch
 Patch5:		%{name}-jni.patch
+Patch6:		%{name}-system-gtest.patch
 URL:		https://www.libelektra.org/
 %if %{with qt}
 BuildRequires:	Qt5Core-devel >= 5.3
@@ -534,6 +535,7 @@ Wiązanie języka Ruby dla Elektry.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env bash,/bin/bash,' $(grep -l '/usr/bin/env bash' -r scripts)
 %{__sed} -i -e '1s,/usr/bin/env sh,/bin/sh,' scripts/check-env-dep
@@ -549,6 +551,7 @@ cd build
 %cmake .. \
 	-DBINDINGS="INTERCEPT;cpp;io_uv%{?with_glib:;glib;io_glib%{?with_gsettings:;gsettings}%{?with_lua:;gi_lua}%{?with_python3:;gi_python}}%{?with_java_mvn:;jna}%{?with_lua:;swig_lua}%{?with_python2:;swig_python2}%{?with_python3:;swig_python}%{?with_ruby:;swig_ruby}" \
 	%{!?with_full:-DBUILD_FULL=OFF} \
+	-DENABLE_TESTING=FALSE \
 	-DINSTALL_TESTING=FALSE \
 	%{?with_glib:-DIS_GLIB_ADDED=ON} \
 	-DPLUGINS=ALL \
