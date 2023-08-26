@@ -1,0 +1,11 @@
+--- elektra-0.8.26/cmake/Modules/FindLibGit2.cmake.orig	2019-02-26 12:45:46.000000000 +0100
++++ elektra-0.8.26/cmake/Modules/FindLibGit2.cmake	2023-08-26 23:29:23.468868236 +0200
+@@ -15,7 +15,7 @@
+ if (NOT LibGit2_VERSION_HEADER STREQUAL LibGit2_VERSION_HEADER-NOTFOUND)
+ 	file (STRINGS ${LibGit2_VERSION_HEADER}
+ 		      LibGit2_VERSION
+-	      REGEX "#define LIBGIT2_VERSION \".+\""
++	      REGEX "#define[\t ]+LIBGIT2_VERSION[\t ]+\".+\""
+ 	      LIMIT_COUNT 1)
+ 	string (REGEX
+ 		REPLACE ".*\"(.+)\""

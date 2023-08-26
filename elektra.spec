@@ -41,6 +41,7 @@ Patch3:		gcc11.patch
 Patch4:		%{name}-gpgme.patch
 Patch5:		%{name}-jni.patch
 Patch6:		%{name}-system-gtest.patch
+Patch7:		libgit2-detect.patch
 URL:		https://www.libelektra.org/
 %if %{with qt}
 BuildRequires:	Qt5Core-devel >= 5.3
@@ -536,6 +537,7 @@ Wiązanie języka Ruby dla Elektry.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env bash,/bin/bash,' $(grep -l '/usr/bin/env bash' -r scripts)
 %{__sed} -i -e '1s,/usr/bin/env sh,/bin/sh,' scripts/check-env-dep
