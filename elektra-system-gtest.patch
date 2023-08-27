@@ -1,6 +1,6 @@
---- elektra-0.8.26/tests/CMakeLists.txt.orig	2019-02-26 12:45:46.000000000 +0100
-+++ elektra-0.8.26/tests/CMakeLists.txt	2022-07-06 20:43:06.457706947 +0200
-@@ -12,38 +12,8 @@ include (LibAddMacros)
+--- elektra-0.9.14/tests/CMakeLists.txt.orig	2023-08-25 20:31:59.347103750 +0200
++++ elektra-0.9.14/tests/CMakeLists.txt	2023-08-25 20:32:56.280128651 +0200
+@@ -12,30 +12,8 @@ include (LibAddMacros)
  
  if (ENABLE_TESTING)
  
@@ -12,36 +12,28 @@
 -		set (googletest_BINARY_DIR "${CMAKE_BINARY_DIR}/gtest")
 -	else (DEFINED GOOGLETEST_ROOT)
 -		include (DownloadProject)
--		if (CMAKE_VERSION VERSION_LESS 3.2)
--			set (UPDATE_DISCONNECTED_IF_AVAILABLE "")
--		else ()
--			set (UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
--		endif ()
 -
--		download_project (PROJ googletest
--				  GIT_REPOSITORY https://github.com/google/googletest.git
--				  GIT_TAG release-1.8.1
--				  QUIET
--				  ${UPDATE_DISCONNECTED_IF_AVAILABLE})
+-		download_project (
+-			PROJ googletest
+-			GIT_REPOSITORY https://github.com/google/googletest.git
+-			GIT_TAG release-1.12.1 QUIET UPDATE_DISCONNECTED 1)
 -	endif (DEFINED GOOGLETEST_ROOT)
 -
 -	# Prevent GoogleTest from overriding our compiler/linker options when building with Visual Studio
--	set (gtest_force_shared_crt
--	     ON
--	     CACHE BOOL
--		   ""
--	     FORCE)
+-	set (
+-		gtest_force_shared_crt
+-		ON
+-		CACHE BOOL "" FORCE)
 -
 -	add_subdirectory (${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 -
--	set_property (TARGET gtest
--		      PROPERTY COMPILE_FLAGS
--			       "-Wno-undef")
+-	set_property (TARGET gtest PROPERTY COMPILE_FLAGS "-Wno-undef")
+-	set_property (TARGET gtest_main PROPERTY COMPILE_FLAGS "-Wno-undef")
  endif (ENABLE_TESTING)
  
  # don't call add_headers in a loop
---- elektra-0.8.26/cmake/Modules/LibAddPlugin.cmake.orig	2019-02-26 12:45:46.000000000 +0100
-+++ elektra-0.8.26/cmake/Modules/LibAddPlugin.cmake	2022-07-06 21:58:10.920432262 +0200
+--- elektra-0.9.14/scripts/cmake/Modules/LibAddPlugin.cmake.orig	2019-02-26 12:45:46.000000000 +0100
++++ elektra-0.9.14/scripts/cmake/Modules/LibAddPlugin.cmake	2022-07-06 21:58:10.920432262 +0200
 @@ -183,7 +183,7 @@ function (add_plugintest testname)
  		target_link_elektra (${testexename} elektra-kdb elektra-plugin ${ARG_LINK_ELEKTRA} ${ARG_TEST_LINK_ELEKTRA})
  

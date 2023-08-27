@@ -1,20 +1,19 @@
 cmake_push_check_state (RESET) resets also CMAKE_REQUIRED_INCLUDES, which are essential here
 
---- elektra-0.8.26/cmake/Modules/SafeCheckSymbolExists.cmake.orig	2019-02-26 12:45:46.000000000 +0100
-+++ elektra-0.8.26/cmake/Modules/SafeCheckSymbolExists.cmake	2022-07-03 21:43:13.742177612 +0200
-@@ -15,6 +15,7 @@ include (CMakePushCheckState)
+--- elektra-0.9.14/scripts/cmake/Modules/SafeCheckSymbolExists.cmake.orig	2023-08-25 20:28:50.328127754 +0200
++++ elektra-0.9.14/scripts/cmake/Modules/SafeCheckSymbolExists.cmake	2023-08-25 20:30:56.444111192 +0200
+@@ -15,12 +15,14 @@ include (CMakePushCheckState)
  
  macro (safe_check_symbol_exists SYMBOL FILES VARIABLE)
  	set (CMAKE_C_FLAGS_OLD ${CMAKE_C_FLAGS})
 +	set (SAVE_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
- 	string (REPLACE "-Wpedantic"
- 			""
- 			CMAKE_C_FLAGS
-@@ -25,6 +26,7 @@ macro (safe_check_symbol_exists SYMBOL F
+ 	string (REPLACE "-Wpedantic" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+ 
+ 	cmake_push_check_state ()
+ 	get_directory_property (DEFS COMPILE_DEFINITIONS)
  	prepend (DEFS "-D" ${DEFS})
- 	list (APPEND CMAKE_REQUIRED_DEFINITIONS
- 		     ${DEFS})
+ 	list (APPEND CMAKE_REQUIRED_DEFINITIONS ${DEFS})
 +	set (CMAKE_REQUIRED_INCLUDES ${SAVE_CMAKE_REQUIRED_INCLUDES})
  
  	check_symbol_exists ("${SYMBOL}" "${FILES}" "${VARIABLE}")
- 
+ 	cmake_pop_check_state ()

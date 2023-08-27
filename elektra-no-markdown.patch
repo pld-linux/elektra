@@ -1,6 +1,6 @@
---- elektra-0.8.26/cmake/Modules/FindDiscount.cmake.orig	2022-07-03 17:23:48.529834939 +0200
-+++ elektra-0.8.26/cmake/Modules/FindDiscount.cmake	2022-07-03 17:26:08.972407429 +0200
-@@ -72,7 +72,7 @@ if (NOT DISCOUNT_FOUND)
+--- elektra-0.9.14/scripts/cmake/Modules/FindDISCOUNT.cmake.orig	2023-03-16 16:11:44.000000000 +0100
++++ elektra-0.9.14/scripts/cmake/Modules/FindDISCOUNT.cmake	2023-08-25 19:54:52.422501370 +0200
+@@ -70,7 +70,7 @@ if (NOT DISCOUNT_FOUND)
  
  	# ____________________________________________________________________________ Actions taken when all components have been found
  
