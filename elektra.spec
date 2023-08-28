@@ -95,6 +95,7 @@ BuildRequires:	swig-python >= 3
 BuildRequires:	systemd-devel
 BuildRequires:	tcl-devel
 BuildRequires:	xerces-c-devel >= 3.0.0
+BuildRequires:	xfconf-devel
 BuildRequires:	yajl-devel
 BuildRequires:	yaml-cpp-devel >= 0.5
 BuildRequires:	zeromq-devel >= 3.2
