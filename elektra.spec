@@ -1,8 +1,6 @@
 # TODO:
-# - subpackage crypto modules? (-plugin-crypto_{botan,gcrypt,openssl} or so)
 # - force maven to work without network, enable java_mvn
-# - rest-backend (BR: cppcms boost >= 1.45 libjwt openssl)
-# - rest-frontend, web (BR: npm)
+# - web tool (BR: npm)
 # - use system nickel (1.1.0, in src/plugins/ni)
 #
 # Conditonal build:
@@ -25,12 +23,12 @@
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.9.14
+Version:	0.10.0
 Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	eb0f1d2e5d93bbae122999b5a27be343
+# Source0-md5:	39ac04c8a0b07061bea781fd73cb13aa
 Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
 Patch4:		%{name}-gpgme.patch
@@ -48,17 +46,16 @@ BuildRequires:	Qt5Test-devel >= 5.3
 BuildRequires:	Qt5Widgets-devel >= 5.3
 %endif
 BuildRequires:	augeas-devel >= 1.0
-BuildRequires:	boost-devel
-BuildRequires:	botan2-devel
-BuildRequires:	cmake >= 3.0
+BuildRequires:	bison
+BuildRequires:	cmake >= 3.12
 BuildRequires:	curl-devel >= 7.28.0
 BuildRequires:	dbus-devel
 BuildRequires:	doxygen
+BuildRequires:	flex
 BuildRequires:	gcc >= 6:4.8
 BuildRequires:	gettext-tools
 %{?with_glib:BuildRequires:	glib2-devel >= 1:2.36}
 %{?with_gsettings:BuildRequires:	glib2-devel >= 1:2.42}
-%{?with_glib:BuildRequires:	gobject-introspection-devel >= 1.38}
 BuildRequires:	gpgme-devel >= 1.10
 # for binding
 %{?with_java_mvn:BuildRequires:	java-jna >= 4.5.0}
@@ -585,114 +582,113 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 %dir %{_libdir}/elektra
 # R: augeas-libs >= 1.0 libxml2
-%attr(755,root,root) %{_libdir}/elektra/libelektra-augeas.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-backend.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-base64.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-blacklist.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-blockresolver.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-c.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-ccode.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-conditionals.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-constants.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-counter.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-augeas.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-backend.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-base64.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-blacklist.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-blockresolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-c.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-ccode.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-conditionals.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-constants.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-counter.so
 # R: libstdc++
-%attr(755,root,root) %{_libdir}/elektra/libelektra-cpptemplate.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-cpptemplate.so
 # R: libgcrypt
-%attr(755,root,root) %{_libdir}/elektra/libelektra-crypto.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-csvstorage.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-crypto.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-csvstorage.so
 # R: curl-libs >= 7.28.0
-%attr(755,root,root) %{_libdir}/elektra/libelektra-curlget.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-date.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-curlget.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-date.so
 # R: dbus
-%attr(755,root,root) %{_libdir}/elektra/libelektra-dbus.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-dbus.so
 # R: dbus
-%attr(755,root,root) %{_libdir}/elektra/libelektra-dbusrecv.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-desktop.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-directoryvalue.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-doc.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-dpkg.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-dump.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-email.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-error.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-fcrypt.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-file.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-filecheck.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-fstab.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-dbusrecv.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-desktop.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-directoryvalue.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-doc.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-dpkg.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-dump.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-email.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-error.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-fcrypt.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-file.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-filecheck.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-fstab.so
 # R: libgit2 >= 0.24.1
-%attr(755,root,root) %{_libdir}/elektra/libelektra-gitresolver.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-glob.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-gopts.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-gitresolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-glob.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-gopts.so
 # R: gpgme
-%attr(755,root,root) %{_libdir}/elektra/libelektra-gpgme.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-hexcode.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-hexnumber.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-hosts.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-iconv.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-internalnotification.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-ipaddr.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-iterate.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-gpgme.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-hexcode.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-hexnumber.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-hosts.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-iconv.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-internalnotification.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-ipaddr.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-iterate.so
 # R: systemd-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-journald.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-journald.so
 # R: libstdc++
-%attr(755,root,root) %{_libdir}/elektra/libelektra-kconfig.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-keytometa.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-length.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-line.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-lineendings.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-logchange.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-macaddr.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-mathcheck.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-mini.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-missing.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-modules.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-mozprefs.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-multifile.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-network.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-noresolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-kconfig.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-keytometa.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-length.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-line.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-lineendings.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-logchange.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-macaddr.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-mathcheck.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-mini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-missing.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-modules.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-mozprefs.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-network.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-noresolver.so
 # uses internal nickel library
-%attr(755,root,root) %{_libdir}/elektra/libelektra-ni.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-passwd.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-path.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-process.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-profile.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-quickdump.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-range.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-reference.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-rename.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-resolver.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-resolver_fm_*.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-rgbcolor.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-shell.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-simpleini.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-spec.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-specload.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-storage.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-sync.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-syslog.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-template.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-timeofday.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-toml.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-tracer.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-type.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-unit.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-uname.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-validation.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-version.so
-%attr(755,root,root) %{_libdir}/elektra/libelektra-wresolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-ni.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-passwd.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-path.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-process.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-profile.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-quickdump.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-range.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-reference.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-rename.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-resolver.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-resolver_fm_*.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-rgbcolor.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-shell.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-simpleini.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-spec.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-specload.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-storage.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-sync.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-syslog.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-template.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-timeofday.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-toml.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-tracer.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-type.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-unit.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-uname.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-validation.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-version.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-wresolver.so
 # R: xerces-c >= 3.0.0
-%attr(755,root,root) %{_libdir}/elektra/libelektra-xerces.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xerces.so
 # R: glib xfconf
-%attr(755,root,root) %{_libdir}/elektra/libelektra-xfconf.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xfconf.so
 # R: libxml2
-%attr(755,root,root) %{_libdir}/elektra/libelektra-xmltool.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xmltool.so
 # R: yajl
-%attr(755,root,root) %{_libdir}/elektra/libelektra-yajl.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-yajl.so
 # R: yaml-cpp >= 0.5
-%attr(755,root,root) %{_libdir}/elektra/libelektra-yamlcpp.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-yamlcpp.so
 # R: zeromq
-%attr(755,root,root) %{_libdir}/elektra/libelektra-zeromqrecv.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-zeromqrecv.so
 # R: zeromq
-%attr(755,root,root) %{_libdir}/elektra/libelektra-zeromqsend.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-zeromqsend.so
 %dir %{_libdir}/elektra/tool_exec
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/backup
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/benchmark-createtree
@@ -802,28 +798,28 @@ rm -rf $RPM_BUILD_ROOT
 %files plugin-jni
 %defattr(644,root,root,755)
 # R: jre with jawt
-%attr(755,root,root) %{_libdir}/elektra/libelektra-jni.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-jni.so
 %endif
 
 %if %{with lua}
 %files plugin-lua
 %defattr(644,root,root,755)
 # R: lua52-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-lua.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-lua.so
 %endif
 
 %if %{with python3}
 %files plugin-python3
 %defattr(644,root,root,755)
 # R: python3-libs
-%attr(755,root,root) %{_libdir}/elektra/libelektra-python.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-python.so
 %endif
 
 %if %{with ruby}
 %files plugin-ruby
 %defattr(644,root,root,755)
 # R: ruby
-%attr(755,root,root) %{_libdir}/elektra/libelektra-ruby.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-ruby.so
 %endif
 
 %files -n bash-completion-elektra
@@ -906,6 +902,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/elektra.h
 %{_includedir}/elektra/elektra
 %{_includedir}/elektra/kdb.h
+%{_includedir}/elektra/kdbchangetracking.h
 %{_includedir}/elektra/kdbease.h
 %{_includedir}/elektra/kdbendian.h
 %{_includedir}/elektra/kdbextension.h
