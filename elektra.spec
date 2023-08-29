@@ -1,4 +1,7 @@
 # TODO:
+# - rust binding
+# - erlang/elixir binding (erl_nif)
+# - go-elektra binding
 # - force maven to work without network, enable java_mvn
 # - web tool (BR: npm)
 # - use system nickel (1.1.0, in src/plugins/ni)
@@ -13,6 +16,7 @@
 %bcond_without	python3		# Python 3 support: bindings and plugin
 %bcond_without	qt		# Qt GUI
 %bcond_without	ruby		# Ruby binding and plugin
+%bcond_without	xfconf		# xfconf binding and plugin
 
 %if %{without glib}
 %undefine	with_gsettings
@@ -23,12 +27,12 @@
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
-Version:	0.10.0
+Version:	0.11.0
 Release:	1
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	39ac04c8a0b07061bea781fd73cb13aa
+# Source0-md5:	47e52f34507fefd3e05a399383be7353
 Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
 Patch4:		%{name}-gpgme.patch
@@ -91,8 +95,9 @@ BuildRequires:	swig-python >= 3
 %{?with_ruby:BuildRequires:	swig-ruby >= 3.0.8}
 BuildRequires:	systemd-devel
 BuildRequires:	tcl-devel
+BuildRequires:	unixODBC-devel
 BuildRequires:	xerces-c-devel >= 3.0.0
-BuildRequires:	xfconf-devel
+%{?with_xfconf:BuildRequires:	xfconf-devel >= 4.16}
 BuildRequires:	yajl-devel
 BuildRequires:	yaml-cpp-devel >= 0.5
 BuildRequires:	zeromq-devel >= 3.2
@@ -501,7 +506,7 @@ Wiązanie języka Ruby dla Elektry.
 install -d build
 cd build
 %cmake .. \
-	-DBINDINGS="INTERCEPT;cpp;io_ev;io_uv%{?with_glib:;glib;io_glib}%{?with_gsettings:;gsettings}%{?with_java_mvn:;jna}%{?with_lua:;lua}%{?with_python3:;python}%{?with_ruby:;ruby}" \
+	-DBINDINGS="INTERCEPT;cpp;io_ev;io_uv%{?with_glib:;glib;io_glib}%{?with_gsettings:;gsettings}%{?with_java_mvn:;jna}%{?with_lua:;lua}%{?with_python3:;python}%{?with_ruby:;ruby}%{?with_xfconf:;xfconf}" \
 	%{!?with_full:-DBUILD_FULL=OFF} \
 	-DBUILD_TESTING=OFF \
 	-DENABLE_TESTING=OFF \
@@ -581,9 +586,13 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/kdb-full
 %endif
 %dir %{_libdir}/elektra
+# R: yaml-cpp libstdc++
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-ansible.so
 # R: augeas-libs >= 1.0 libxml2
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-augeas.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-backend.so
+# R: unixODBC
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-backend_odbc.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-base64.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-blacklist.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-blockresolver.so
@@ -653,6 +662,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-profile.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-quickdump.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-range.so
+%attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-recorder.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-reference.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-rename.so
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-resolver.so
@@ -677,8 +687,10 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-wresolver.so
 # R: xerces-c >= 3.0.0
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xerces.so
+%if %{with xfconf}
 # R: glib xfconf
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xfconf.so
+%endif
 # R: libxml2
 %attr(755,root,root) %{_libdir}/elektra/libelektra-plugin-xmltool.so
 # R: yajl
@@ -723,6 +735,13 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/umount-all
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/update-snippet-repository
 %attr(755,root,root) %{_libdir}/elektra/tool_exec/upgrade-bootstrap
+%if %{with xfconf}
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/xfconf-populate
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/xfconf-system-lib-replace
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/xfconf-system-lib-restore
+%attr(755,root,root) %{_libdir}/elektra/tool_exec/xfconf-user-lib-replace
+%attr(755,root,root) %{_libdir}/libxfconf-elektra.so
+%endif
 %{_datadir}/sgml/elektra
 %{_mandir}/man1/kdb.1*
 %{_mandir}/man1/kdb-backup.1*
@@ -760,12 +779,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/kdb-mount.1*
 %{_mandir}/man1/kdb-mount-java.1*
 %{_mandir}/man1/kdb-mount-list-all-files.1*
-%{_mandir}/man1/kdb-mountpoint-info.*
+%{_mandir}/man1/kdb-mountOdbc.1*
+%{_mandir}/man1/kdb-mountpoint-info.1*
 %{_mandir}/man1/kdb-mv.1*
 %{_mandir}/man1/kdb-namespace.1*
 %{_mandir}/man1/kdb-plugin-check.1*
 %{_mandir}/man1/kdb-plugin-info.1*
 %{_mandir}/man1/kdb-plugin-list.1*
+%{_mandir}/man1/kdb-record-export.1*
+%{_mandir}/man1/kdb-record-reset.1*
+%{_mandir}/man1/kdb-record-rm.1*
+%{_mandir}/man1/kdb-record-start.1*
+%{_mandir}/man1/kdb-record-state.1*
+%{_mandir}/man1/kdb-record-stop.1*
+%{_mandir}/man1/kdb-record-undo.1*
 %{_mandir}/man1/kdb-remount.1*
 %{_mandir}/man1/kdb-reset.1*
 %{_mandir}/man1/kdb-reset-elektra.1*
@@ -862,6 +889,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %ghost %{_libdir}/libelektra-plugin.so.5
 %attr(755,root,root) %{_libdir}/libelektra-pluginprocess.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-pluginprocess.so.5
+%attr(755,root,root) %{_libdir}/libelektra-record.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libelektra-record.so.5
 %attr(755,root,root) %{_libdir}/libelektra-utility.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libelektra-utility.so.5
 %attr(755,root,root) %{_libdir}/libelektraintercept-env.so.*.*.*
@@ -890,6 +919,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libelektra-opts.so
 %attr(755,root,root) %{_libdir}/libelektra-plugin.so
 %attr(755,root,root) %{_libdir}/libelektra-pluginprocess.so
+%attr(755,root,root) %{_libdir}/libelektra-record.so
 %attr(755,root,root) %{_libdir}/libelektra-utility.so
 %attr(755,root,root) %{_libdir}/libelektragetenv.so
 %attr(755,root,root) %{_libdir}/libelektraintercept-env.so
@@ -903,6 +933,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/elektra
 %{_includedir}/elektra/kdb.h
 %{_includedir}/elektra/kdbchangetracking.h
+%{_includedir}/elektra/kdbdiff.h
 %{_includedir}/elektra/kdbease.h
 %{_includedir}/elektra/kdbendian.h
 %{_includedir}/elektra/kdbextension.h
@@ -923,6 +954,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/elektra/kdbplugin.h
 %{_includedir}/elektra/kdbpluginprocess.h
 %{_includedir}/elektra/kdbprivate.h
+%{_includedir}/elektra/kdbrecord.h
 %{_includedir}/elektra/kdbtypes.h
 %{_includedir}/elektra/kdbutility.h
 %{_includedir}/elektra/kdbversion.h
@@ -950,6 +982,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/elektra_array_value.c.3elektra*
 %{_mandir}/man3/elektra_error.c.3elektra*
 %{_mandir}/man3/elektra_value.c.3elektra*
+%{_mandir}/man3/elektradiff.hpp.3elektra*
+%{_mandir}/man3/elektradiffexcept.hpp.3elektra*
 %{_mandir}/man3/error.h.3elektra*
 %{_mandir}/man3/errors.c.3elektra*
 %{_mandir}/man3/ev.h.3elektra*
@@ -1133,8 +1167,10 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc src/bindings/swig/python/README.md
 %dir %{py3_sitedir}/kdb
+%attr(755,root,root) %{py3_sitedir}/kdb/_errors.so
 %attr(755,root,root) %{py3_sitedir}/kdb/_kdb.so
 %attr(755,root,root) %{py3_sitedir}/kdb/_merge.so
+%attr(755,root,root) %{py3_sitedir}/kdb/_record.so
 %attr(755,root,root) %{py3_sitedir}/kdb/_tools.so
 %{py3_sitedir}/kdb/*.py
 %{py3_sitedir}/kdb/__pycache__
