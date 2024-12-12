@@ -24,6 +24,12 @@
 %if %{without java}
 %undefine	with_java_mvn
 %endif
+
+%if %{with java} || %{with java_mvn}
+%define		min_jdk_version	11
+%{?use_default_jdk}
+%endif
+
 Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
@@ -64,9 +70,9 @@ BuildRequires:	gpgme-devel >= 1.10
 # for binding
 %{?with_java_mvn:BuildRequires:	java-jna >= 4.5.0}
 %{?with_java_mvn:BuildRequires:	java-junit >= 4.12}
-%{?with_java:BuildRequires:	jdk >= 10}
+%{?with_java:%buildrequires_jdk}
 # jawt for plugin
-%{?with_java:BuildRequires:	jre-X11 >= 1.10}
+%{?with_java:%{?use_jdk:BuildRequires: %{use_jdk}-jre-base-X11}}
 BuildRequires:	libev-devel
 BuildRequires:	libgcrypt-devel
 BuildRequires:	libgit2-devel >= 0.24.1
@@ -85,7 +91,7 @@ BuildRequires:	pkgconfig
 BuildRequires:	ronn
 BuildRequires:	rpm-build >= 4.6
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.612
+BuildRequires:	rpmbuild(macros) >= 2.021
 %{?with_ruby:BuildRequires:	ruby-devel}
 BuildRequires:	sed >= 4.0
 BuildRequires:	swig >= 3
@@ -515,7 +521,10 @@ cd build
 	-DPLUGINS=ALL \
 	-DTARGET_CMAKE_FOLDER=%{_datadir}/cmake/Modules \
 	-DTOOLS="kdb;race%{?with_gen:;pythongen}%{?with_qt:;qt-gui}" \
-	-DBUILD_STATIC=ON
+	-DBUILD_STATIC=ON \
+%if %{with java} || %{with java_mvn}
+	-DJAVA_HOME:PATH="%{java_home}"
+%endif
 
 %{__make}
 
