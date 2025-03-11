@@ -492,12 +492,12 @@ Wiązanie języka Ruby dla Elektry.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 4 -p1
+%patch -P 5 -p1
+%patch -P 6 -p1
+%patch -P 7 -p1
 
 %{__sed} -i -e '1s,/usr/bin/env bash,/bin/bash,' $(grep -l '/usr/bin/env bash' -r scripts)
 %{__sed} -i -e '1s,/usr/bin/env sh,/bin/sh,' scripts/check-env-dep scripts/kdb/mount-list-all-files
