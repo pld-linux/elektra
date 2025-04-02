@@ -1,0 +1,11 @@
+--- elektra-0.11.0/src/plugins/python/python.cpp.orig	2023-08-04 14:09:00.000000000 +0200
++++ elektra-0.11.0/src/plugins/python/python.cpp	2025-04-02 19:48:08.861082920 +0200
+@@ -337,7 +337,7 @@ int PYTHON_PLUGIN_FUNCTION (Open) (ckdb:
+ 
+ 		/* create instance of class */
+ 		PyObject * inst_args = Py_BuildValue ("()");
+-		PyObject * inst = PyEval_CallObject (klass, inst_args);
++		PyObject * inst = PyObject_CallObject (klass, inst_args);
+ 		Py_DECREF (klass);
+ 		Py_DECREF (inst_args);
+ 		if (inst == nullptr)

@@ -34,13 +34,14 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.11.0
-Release:	4
+Release:	5
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
 # Source0-md5:	47e52f34507fefd3e05a399383be7353
 Patch0:		%{name}-zsh.patch
 Patch1:		%{name}-no-markdown.patch
+Patch2:		%{name}-python.patch
 Patch4:		%{name}-gpgme.patch
 Patch5:		%{name}-jni.patch
 Patch6:		%{name}-system-gtest.patch
@@ -494,6 +495,7 @@ Wiązanie języka Ruby dla Elektry.
 %setup -q
 %patch -P 0 -p1
 %patch -P 1 -p1
+%patch -P 2 -p1
 %patch -P 4 -p1
 %patch -P 5 -p1
 %patch -P 6 -p1
