@@ -34,7 +34,7 @@ Summary:	A key/value pair database to store software configurations
 Summary(pl.UTF-8):	Baza kluczy/wartości do przechowywania konfiguracji oprogramowania
 Name:		elektra
 Version:	0.11.0
-Release:	6
+Release:	7
 License:	BSD
 Group:		Applications/System
 Source0:	https://www.libelektra.org/ftp/elektra/releases/%{name}-%{version}.tar.gz
